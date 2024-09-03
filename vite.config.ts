@@ -10,7 +10,7 @@ import {
 } from "./build/utils";
 
 export default ({ mode }: ConfigEnv): UserConfigExport => {
-  const { VITE_CDN, VITE_PORT, VITE_COMPRESSION, VITE_PUBLIC_PATH } =
+  const { VITE_CDN, VITE_PORT, VITE_COMPRESSION, VITE_PUBLIC_PATH, VITE_API } =
     wrapperEnv(loadEnv(mode, root));
   return {
     base: VITE_PUBLIC_PATH,
@@ -24,7 +24,30 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       port: VITE_PORT,
       host: "0.0.0.0",
       // 本地跨域代理 https://cn.vitejs.dev/config/server-options.html#server-proxy
-      proxy: {},
+      proxy: {
+        "/api": {
+          // 这里填写后端地址
+          target: VITE_API,
+          changeOrigin: true,
+          bypass(req, res, options: any) {
+            //这段代码可以看到代理后的地址
+            const proxyURL = options.target + req.url;
+            console.log("proxyURL", proxyURL);
+            res.setHeader("x-req-proxyURL", proxyURL); // 设置响应头可以看到
+          }
+        },
+        "/connect": {
+          // 这里填写后端地址
+          target: VITE_API,
+          changeOrigin: true,
+          bypass(req, res, options: any) {
+            //这段代码可以看到代理后的地址
+            const proxyURL = options.target + req.url;
+            console.log("proxyURL", proxyURL);
+            res.setHeader("x-req-proxyURL", proxyURL); // 设置响应头可以看到
+          }
+        }
+      },
       // 预热文件以提前转换和缓存结果，降低启动期间的初始页面加载时长并防止转换瀑布
       warmup: {
         clientFiles: ["./index.html", "./src/{views,components}/*"]
