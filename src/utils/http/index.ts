@@ -173,7 +173,7 @@ class PureHttp {
   }
 
   /** 单独抽离的`post`工具函数 */
-  public post<T, P>(
+  public post<T, P = any>(
     url: string,
     params?: AxiosRequestConfig<P>,
     config?: PureHttpRequestConfig
@@ -182,12 +182,30 @@ class PureHttp {
   }
 
   /** 单独抽离的`get`工具函数 */
-  public get<T, P>(
+  public get<T, P = any>(
     url: string,
     params?: AxiosRequestConfig<P>,
     config?: PureHttpRequestConfig
   ): Promise<T> {
     return this.request<T>("get", url, params, config);
+  }
+
+  /** 单独抽离的`put`工具函数 */
+  public put<T, P = any>(
+    url: string,
+    params?: AxiosRequestConfig<P>,
+    config?: PureHttpRequestConfig
+  ): Promise<T> {
+    return this.request<T>("put", url, params, config);
+  }
+
+  /** 单独抽离的`delete`工具函数 */
+  public delete<T, P = any>(
+    url: string,
+    params?: AxiosRequestConfig<P>,
+    config?: PureHttpRequestConfig
+  ): Promise<T> {
+    return this.request<T>("delete", url, params, config);
   }
 }
 

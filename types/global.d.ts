@@ -197,4 +197,9 @@ declare global {
       touched?: boolean;
     };
   }
+
+  declare type NameValue<T> = {
+    name: string;
+    value: T;
+  };
 }
