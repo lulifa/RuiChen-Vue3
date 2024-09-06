@@ -18,7 +18,7 @@ export const findByUserName = (userName: string) => {
 
 export const search = (input: UserLookupSearchRequest) => {
   return http.get<ListResultDto<IUserData>>(
-    baseUrlApi("/api/identity/users/lookup/search"),
+    baseUrlApi("identity/users/lookup/search"),
     { params: input }
   );
 };

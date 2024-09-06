@@ -11,31 +11,31 @@ import type { GetRolePagedRequest, Role } from "../identity-role/model";
 
 export const create = (input: CreateOrganizationUnit) => {
   return http.post<OrganizationUnit>(
-    baseUrlApi("/api/identity/organization-units"),
+    baseUrlApi("identity/organization-units"),
     { data: input }
   );
 };
 
 export const update = (id: string, input: UpdateOrganizationUnit) => {
   return http.put<OrganizationUnit>(
-    baseUrlApi(`/api/identity/organization-units/${id}`),
+    baseUrlApi(`identity/organization-units/${id}`),
     { data: input }
   );
 };
 
 export const deleteById = (id: string) => {
-  return http.delete(baseUrlApi(`/api/identity/organization-units/${id}`));
+  return http.delete(baseUrlApi(`identity/organization-units/${id}`));
 };
 
 export const get = (id: string) => {
   return http.get<OrganizationUnit>(
-    baseUrlApi(`/api/identity/organization-units/${id}`)
+    baseUrlApi(`identity/organization-units/${id}`)
   );
 };
 
 export const getList = (input: GetOrganizationUnitPagedRequest) => {
   return http.get<PagedResultDto<OrganizationUnit>>(
-    baseUrlApi("/api/identity/organization-units"),
+    baseUrlApi("identity/organization-units"),
     {
       params: input
     }
@@ -46,7 +46,7 @@ export const getUnaddedMemberList = (
   input: { id: string } & GetUserPagedRequest
 ) => {
   return http.get<PagedResultDto<User>>(
-    baseUrlApi(`/api/identity/organization-units/${input.id}/unadded-users`),
+    baseUrlApi(`identity/organization-units/${input.id}/unadded-users`),
     {
       params: {
         filter: input.filter,
@@ -60,7 +60,7 @@ export const getUnaddedMemberList = (
 
 export const getMemberList = (id: string, input: GetUserPagedRequest) => {
   return http.get<PagedResultDto<User>>(
-    baseUrlApi(`/api/identity/organization-units/${id}/users`),
+    baseUrlApi(`identity/organization-units/${id}/users`),
     {
       params: input
     }
@@ -71,7 +71,7 @@ export const getUnaddedRoleList = (
   input: { id: string } & GetRolePagedRequest
 ) => {
   return http.get<PagedResultDto<Role>>(
-    baseUrlApi(`/api/identity/organization-units/${input.id}/unadded-roles`),
+    baseUrlApi(`identity/organization-units/${input.id}/unadded-roles`),
     {
       params: {
         filter: input.filter,
@@ -85,19 +85,19 @@ export const getUnaddedRoleList = (
 
 export const getRoleList = (id: string, input: GetRolePagedRequest) => {
   return http.get<PagedResultDto<Role>>(
-    baseUrlApi(`/api/identity/organization-units/${id}/roles`),
+    baseUrlApi(`identity/organization-units/${id}/roles`),
     { params: input }
   );
 };
 
 export const getAll = () => {
   return http.get<ListResultDto<OrganizationUnit>>(
-    baseUrlApi("/api/identity/organization-units/all")
+    baseUrlApi("identity/organization-units/all")
   );
 };
 
 export const move = (id: string, parentId?: string) => {
-  return http.put(baseUrlApi(`/api/identity/organization-units/${id}/move`), {
+  return http.put(baseUrlApi(`identity/organization-units/${id}/move`), {
     data: {
       parentId: parentId
     }
@@ -105,14 +105,13 @@ export const move = (id: string, parentId?: string) => {
 };
 
 export const addMembers = (id: string, userIdList: string[]) => {
-  return http.post(baseUrlApi(`/api/identity/organization-units/${id}/users`), {
+  return http.post(baseUrlApi(`identity/organization-units/${id}/users`), {
     data: { userIds: userIdList }
   });
 };
 
-
 export const addRoles = (id: string, roleIdList: string[]) => {
-  return http.post(baseUrlApi(`/api/identity/organization-units/${id}/roles`), {
+  return http.post(baseUrlApi(`identity/organization-units/${id}/roles`), {
     data: { roleIds: roleIdList }
   });
 };
