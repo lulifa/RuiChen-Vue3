@@ -35,7 +35,13 @@ export const useUserStore = defineStore({
     sso: false,
     roles: [],
     permissions: [],
+    // 前端生成的验证码（按实际需求替换）
+    verifyCode: "",
+    // 判断登录页面显示哪个组件（0：登录（默认）、1：手机登录、2：二维码登录、3：注册、4：忘记密码）
+    currentPage: 0,
+    // 是否勾选了登录页的免登录
     isRemembered: false,
+    // 登录页的免登录存储几天，默认7天
     loginDay: 7
   }),
   getters: {
@@ -60,6 +66,12 @@ export const useUserStore = defineStore({
       return state.permissions.length > 0
         ? state.permissions
         : storageLocal().getItem(PERMISSIONS_KEY);
+    },
+    getVerifyCode(state): string {
+      return state.verifyCode;
+    },
+    getCurrentPage(state): number {
+      return state.currentPage;
     },
     getIsRemembered(state): boolean {
       return state.isRemembered === true;
@@ -86,6 +98,14 @@ export const useUserStore = defineStore({
     setPermissions(permissions: Array<string>) {
       this.permissions = permissions;
       storageLocal().setItem(PERMISSIONS_KEY, permissions);
+    },
+    /** 存储前端生成的验证码 */
+    setVerifyCode(verifyCode: string) {
+      this.verifyCode = verifyCode;
+    },
+    /** 存储登录页面显示哪个组件 */
+    setCurrentPage(value: number) {
+      this.currentPage = value;
     },
     setIsRemember(bool: boolean) {
       this.isRemembered = bool;
