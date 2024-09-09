@@ -1,3 +1,4 @@
+import type { GetUserInfoModel } from "@/api/system/system-user/model";
 import type { RouteRecordName } from "vue-router";
 
 export type cacheType = {
@@ -37,6 +38,9 @@ export type setType = {
 };
 
 export type userType = {
+  userInfo: Nullable<GetUserInfoModel>;
+  /** sso标记,用于后台退出 */
+  sso?: boolean;
   avatar?: string;
   username?: string;
   nickname?: string;
@@ -44,4 +48,10 @@ export type userType = {
   permissions?: Array<string>;
   isRemembered?: boolean;
   loginDay?: number;
+};
+
+export type tokenType = {
+  accessToken: string;
+  refreshToken: string;
+  expires: number;
 };

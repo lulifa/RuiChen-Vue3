@@ -18,7 +18,6 @@ import {
 } from "@pureadmin/utils";
 import { getConfig } from "@/config";
 import { buildHierarchyTree } from "@/utils/tree";
-import { userKey, type DataInfo } from "@/utils/auth";
 import { type menuType, routerArrays } from "@/layout/types";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { usePermissionStoreHook } from "@/store/modules/permission";
@@ -28,6 +27,7 @@ const modulesRoutes = import.meta.glob("/src/views/**/*.{vue,tsx}");
 
 // 动态路由
 import { getAsyncRoutes } from "@/api/routes";
+import { useUserStoreHook } from "@/store/modules/user";
 
 function handRank(routeInfo: any) {
   const { name, path, parentId, meta } = routeInfo;
@@ -83,8 +83,7 @@ function isOneOfArray(a: Array<string>, b: Array<string>) {
 
 /** 从localStorage里取出当前登录用户的角色roles，过滤无权限的菜单 */
 function filterNoPermissionTree(data: RouteComponent[]) {
-  const currentRoles =
-    storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
+  const currentRoles = useUserStoreHook().getRoles ?? [];
   const newTree = cloneDeep(data).filter((v: any) =>
     isOneOfArray(v.meta?.roles, currentRoles)
   );

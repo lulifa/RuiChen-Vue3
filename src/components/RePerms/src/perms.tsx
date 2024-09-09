@@ -1,5 +1,5 @@
 import { defineComponent, Fragment } from "vue";
-import { hasPerms } from "@/utils/auth";
+import { useUserStoreHook } from "@/store/modules/user";
 
 export default defineComponent({
   name: "Perms",
@@ -12,7 +12,7 @@ export default defineComponent({
   setup(props, { slots }) {
     return () => {
       if (!slots) return null;
-      return hasPerms(props.value) ? (
+      return useUserStoreHook().hasPerms(props.value) ? (
         <Fragment>{slots.default?.()}</Fragment>
       ) : null;
     };

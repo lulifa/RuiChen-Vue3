@@ -1,4 +1,10 @@
 import { defineStore } from "pinia";
+import { USER_INFO_KEY, ROLES_KEY, PERMISSIONS_KEY } from "@/enums/cacheEnum";
+import {
+  type GetUserInfoModel,
+  LoginParams,
+  LoginByPhoneParams
+} from "@/api/system/system-user/model";
 import {
   type userType,
   store,
@@ -14,55 +20,79 @@ import {
   refreshTokenApi
 } from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
-import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
+import { setToken, removeToken, getToken, hasPerms } from "@/utils/auth";
+import type { tokenType } from "../types";
 
 export const useUserStore = defineStore({
   id: "pure-user",
   state: (): userType => ({
-    // 头像
-    avatar: storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "",
-    // 用户名
-    username: storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "",
-    // 昵称
-    nickname: storageLocal().getItem<DataInfo<number>>(userKey)?.nickname ?? "",
-    // 页面级别权限
-    roles: storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [],
-    // 按钮级别权限
-    permissions:
-      storageLocal().getItem<DataInfo<number>>(userKey)?.permissions ?? [],
-    // 是否勾选了登录页的免登录
+    userInfo: null,
+    sso: false,
+    roles: [],
+    permissions: [],
     isRemembered: false,
-    // 登录页的免登录存储几天，默认7天
     loginDay: 7
   }),
+  getters: {
+    getToken(): tokenType {
+      return getToken();
+    },
+    getUserInfo(state): GetUserInfoModel {
+      return (
+        state.userInfo ||
+        storageLocal().getItem<GetUserInfoModel>(USER_INFO_KEY)
+      );
+    },
+    getSso(state): boolean {
+      return state.sso === true;
+    },
+    getRoles(state): Array<string> {
+      return state.roles.length > 0
+        ? state.roles
+        : storageLocal().getItem(ROLES_KEY);
+    },
+    getPermissions(state): Array<string> {
+      return state.permissions.length > 0
+        ? state.permissions
+        : storageLocal().getItem(PERMISSIONS_KEY);
+    },
+    getIsRemembered(state): boolean {
+      return state.isRemembered === true;
+    },
+    getLoginDay(state): number {
+      return state.loginDay;
+    }
+  },
   actions: {
-    /** 存储头像 */
-    SET_AVATAR(avatar: string) {
-      this.avatar = avatar;
+    setToken(data: tokenType) {
+      setToken(data);
     },
-    /** 存储用户名 */
-    SET_USERNAME(username: string) {
-      this.username = username;
+    removeToken() {
+      removeToken();
     },
-    /** 存储昵称 */
-    SET_NICKNAME(nickname: string) {
-      this.nickname = nickname;
+    setUserinfo(userInfo: GetUserInfoModel) {
+      this.userInfo = userInfo;
+      storageLocal().setItem(USER_INFO_KEY, userInfo);
     },
-    /** 存储角色 */
-    SET_ROLES(roles: Array<string>) {
+    setRoles(roles: Array<string>) {
       this.roles = roles;
+      storageLocal().setItem(ROLES_KEY, roles);
     },
-    /** 存储按钮级别权限 */
-    SET_PERMS(permissions: Array<string>) {
+    setPermissions(permissions: Array<string>) {
       this.permissions = permissions;
+      storageLocal().setItem(PERMISSIONS_KEY, permissions);
     },
-    /** 存储是否勾选了登录页的免登录 */
-    SET_ISREMEMBERED(bool: boolean) {
+    setIsRemember(bool: boolean) {
       this.isRemembered = bool;
     },
-    /** 设置登录页的免登录存储几天 */
-    SET_LOGINDAY(value: number) {
+    setLoginDay(value: number) {
       this.loginDay = Number(value);
+    },
+    formatToken(token: string) {
+      return "Bearer " + token;
+    },
+    hasPerms(value: string | Array<string>) {
+      hasPerms(value);
     },
     /** 登入 */
     async loginByUsername(data) {

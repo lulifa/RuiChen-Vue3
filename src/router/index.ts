@@ -7,7 +7,7 @@ import { buildHierarchyTree } from "@/utils/tree";
 import remainingRouter from "./modules/remaining";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { usePermissionStoreHook } from "@/store/modules/permission";
-import { isUrl, openLink, storageLocal, isAllEmpty } from "@pureadmin/utils";
+import { isUrl, openLink, isAllEmpty } from "@pureadmin/utils";
 import {
   ascending,
   getTopMenu,
@@ -25,12 +25,8 @@ import {
   type RouteRecordRaw,
   type RouteComponent
 } from "vue-router";
-import {
-  type DataInfo,
-  userKey,
-  removeToken,
-  multipleTabsKey
-} from "@/utils/auth";
+import { useUserStoreHook } from "@/store/modules/user";
+import { MULTIPLE_TABS_KEY } from "@/enums/cacheEnum";
 
 /** 自动导入全部静态路由，无需再手动引入！匹配 src/router/modules 目录（任何嵌套级别）中具有 .ts 扩展名的所有文件，除了 remaining.ts 文件
  * 如何匹配所有文件请看：https://github.com/mrmlnc/fast-glob#basic-syntax
@@ -114,7 +110,7 @@ router.beforeEach((to: ToRouteType, _from, next) => {
       handleAliveRoute(to);
     }
   }
-  const userInfo = storageLocal().getItem<DataInfo<number>>(userKey);
+  const roles = useUserStoreHook().getRoles;
   NProgress.start();
   const externalLink = isUrl(to?.name as string);
   if (!externalLink) {
@@ -130,9 +126,9 @@ router.beforeEach((to: ToRouteType, _from, next) => {
   function toCorrectRoute() {
     whiteList.includes(to.fullPath) ? next(_from.fullPath) : next();
   }
-  if (Cookies.get(multipleTabsKey) && userInfo) {
+  if (Cookies.get(MULTIPLE_TABS_KEY) && roles) {
     // 无权限跳转403页面
-    if (to.meta?.roles && !isOneOfArray(to.meta?.roles, userInfo?.roles)) {
+    if (to.meta?.roles && !isOneOfArray(to.meta?.roles, roles)) {
       next({ path: "/error/403" });
     }
     // 开启隐藏首页后在浏览器地址栏手动输入首页welcome路由则跳转到404页面
@@ -192,7 +188,7 @@ router.beforeEach((to: ToRouteType, _from, next) => {
       if (whiteList.indexOf(to.path) !== -1) {
         next();
       } else {
-        removeToken();
+        useUserStoreHook().removeToken();
         next({ path: "/login" });
       }
     } else {

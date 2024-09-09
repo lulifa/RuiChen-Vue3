@@ -11,7 +11,6 @@ import type {
 } from "./types.d";
 import { stringify } from "qs";
 import NProgress from "../progress";
-import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
@@ -51,7 +50,7 @@ class PureHttp {
   private static retryOriginalRequest(config: PureHttpRequestConfig) {
     return new Promise(resolve => {
       PureHttp.requests.push((token: string) => {
-        config.headers["Authorization"] = formatToken(token);
+        config.headers["Authorization"] = useUserStoreHook().formatToken(token);
         resolve(config);
       });
     });
@@ -73,14 +72,13 @@ class PureHttp {
           return config;
         }
         /** 请求白名单，放置一些不需要`token`的接口（通过设置请求白名单，防止`token`过期后再请求造成的死循环问题） */
-        const whiteList = ["/refresh-token", "/login"];
+        const whiteList = ["/connect/token"];
         return whiteList.some(url => config.url.endsWith(url))
           ? config
           : new Promise(resolve => {
-              const data = getToken();
+              const data = useUserStoreHook().getToken;
               if (data) {
-                const now = new Date().getTime();
-                const expired = parseInt(data.expires) - now <= 0;
+                const expired = parseInt(data.expires) - Date.now() <= 0;
                 if (expired) {
                   if (!PureHttp.isRefreshing) {
                     PureHttp.isRefreshing = true;
@@ -89,7 +87,8 @@ class PureHttp {
                       .handRefreshToken({ refreshToken: data.refreshToken })
                       .then(res => {
                         const token = res.data.accessToken;
-                        config.headers["Authorization"] = formatToken(token);
+                        config.headers["Authorization"] =
+                          useUserStoreHook().formatToken(token);
                         PureHttp.requests.forEach(cb => cb(token));
                         PureHttp.requests = [];
                       })
@@ -99,9 +98,8 @@ class PureHttp {
                   }
                   resolve(PureHttp.retryOriginalRequest(config));
                 } else {
-                  config.headers["Authorization"] = formatToken(
-                    data.accessToken
-                  );
+                  config.headers["Authorization"] =
+                    useUserStoreHook().formatToken(data.accessToken);
                   resolve(config);
                 }
               } else {
