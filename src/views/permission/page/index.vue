@@ -15,8 +15,8 @@ const elStyle = computed((): CSSProperties => {
     justifyContent: "start"
   };
 });
-
-const username = ref(useUserStoreHook()?.username);
+const userInfo = useUserStoreHook().getUserInfo;
+const username = ref(userInfo?.username);
 
 const options = [
   {
@@ -31,9 +31,9 @@ const options = [
 
 function onChange() {
   useUserStoreHook()
-    .loginByUsername({ username: username.value, password: "admin123" })
+    .loginApi({ username: username.value, password: "admin123" })
     .then(res => {
-      if (res.success) {
+      if (res.access_token && res.refresh_token) {
         storageLocal().removeItem("async-routes");
         usePermissionStoreHook().clearAllCachePage();
         initRouter();

@@ -1,12 +1,9 @@
 import { defineStore } from "pinia";
 import { USER_INFO_KEY, ROLES_KEY, PERMISSIONS_KEY } from "@/enums/cacheEnum";
-import {
-  type GetUserInfoModel,
-  LoginParams,
-  LoginByPhoneParams
-} from "@/api/system/system-user/model";
+
 import {
   type userType,
+  type tokenType,
   store,
   router,
   resetRouter,
@@ -14,14 +11,22 @@ import {
   storageLocal
 } from "../utils";
 import {
-  type UserResult,
-  type RefreshTokenResult,
-  getLogin,
-  refreshTokenApi
-} from "@/api/user";
+  loginApi,
+  loginRefreshApi,
+  getUserInfo
+} from "@/api/system/system-user";
+import type {
+  LoginParams,
+  LoginResultModel,
+  GetUserInfoModel
+} from "@/api/system/system-user/model";
 import { useMultiTagsStoreHook } from "./multiTags";
-import { setToken, removeToken, getToken, hasPerms } from "@/utils/auth";
-import type { tokenType } from "../types";
+import {
+  setAuthToken,
+  removeAuthToken,
+  getAuthToken,
+  hasAuthPerms
+} from "@/utils/auth";
 
 export const useUserStore = defineStore({
   id: "pure-user",
@@ -35,7 +40,7 @@ export const useUserStore = defineStore({
   }),
   getters: {
     getToken(): tokenType {
-      return getToken();
+      return getAuthToken();
     },
     getUserInfo(state): GetUserInfoModel {
       return (
@@ -65,12 +70,12 @@ export const useUserStore = defineStore({
   },
   actions: {
     setToken(data: tokenType) {
-      setToken(data);
+      setAuthToken(data);
     },
     removeToken() {
-      removeToken();
+      removeAuthToken();
     },
-    setUserinfo(userInfo: GetUserInfoModel) {
+    setUserInfo(userInfo: GetUserInfoModel) {
       this.userInfo = userInfo;
       storageLocal().setItem(USER_INFO_KEY, userInfo);
     },
@@ -91,46 +96,87 @@ export const useUserStore = defineStore({
     formatToken(token: string) {
       return "Bearer " + token;
     },
-    hasPerms(value: string | Array<string>) {
-      hasPerms(value);
+    hasPerms(value: string | Array<string>): boolean {
+      return hasAuthPerms(value);
     },
     /** 登入 */
-    async loginByUsername(data) {
-      return new Promise<UserResult>((resolve, reject) => {
-        getLogin(data)
-          .then(data => {
-            if (data?.success) setToken(data.data);
-            resolve(data);
-          })
-          .catch(error => {
-            reject(error);
-          });
-      });
+    async loginApi(params: LoginParams): Promise<LoginResultModel> {
+      try {
+        const res = await loginApi(params);
+        if (res.access_token && res.refresh_token) {
+          const openiddictToken = {
+            accessToken: res.access_token,
+            refreshToken: res.refresh_token,
+            expires: res.expires_in
+          };
+          await this.setToken(openiddictToken);
+          await this.getUserInfoAction();
+        }
+        return res;
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    /** 刷新 token */
+    async handRefreshToken(params: any): Promise<LoginResultModel> {
+      try {
+        const res = await loginRefreshApi(params);
+        if (res.access_token && res.refresh_token) {
+          const openiddictToken = {
+            accessToken: res.access_token,
+            refreshToken: res.refresh_token,
+            expires: res.expires_in
+          };
+          await this.setToken(openiddictToken);
+          await this.getUserInfoAction();
+        }
+
+        return res;
+      } catch (error) {
+        throw error;
+      }
+    },
+    async getUserInfoAction() {
+      const userInfo = await getUserInfo();
+      // TODO  获取abpStore 初始化abp相关代码
+      let currentUser = userInfo;
+      const outgoingUserInfo: { [key: string]: any } = {
+        // 从 currentuser 接口获取
+        userId: currentUser.id,
+        username: currentUser.userName,
+        roles: ["admin"],
+        // roles: currentUser.roles,
+        // 从 userinfo 端点获取
+        realName: userInfo?.nickname,
+        phoneNumber: userInfo?.phone_number,
+        phoneNumberConfirmed: userInfo?.phone_number_verified === "True",
+        email: userInfo?.email,
+        emailConfirmed: userInfo?.email_verified === "True"
+      };
+      if (userInfo?.avatarUrl) {
+        // outgoingUserInfo.avatar = formatUrl(userInfo.avatarUrl);
+        outgoingUserInfo.avatar = userInfo.avatarUrl;
+      }
+      if (userInfo?.picture) {
+        // outgoingUserInfo.avatar = formatUrl(userInfo.picture);
+        outgoingUserInfo.avatar = userInfo.picture;
+      }
+      this.setUserInfo(outgoingUserInfo);
+      this.setRoles(outgoingUserInfo.roles);
+      this.setPermissions(outgoingUserInfo.permissions);
+
+      return outgoingUserInfo;
     },
     /** 前端登出（不调用接口） */
     logOut() {
-      this.username = "";
+      this.userinfo = null;
       this.roles = [];
       this.permissions = [];
-      removeToken();
+      this.removeToken();
       useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
       resetRouter();
       router.push("/login");
-    },
-    /** 刷新`token` */
-    async handRefreshToken(data) {
-      return new Promise<RefreshTokenResult>((resolve, reject) => {
-        refreshTokenApi(data)
-          .then(data => {
-            if (data) {
-              setToken(data.data);
-              resolve(data);
-            }
-          })
-          .catch(error => {
-            reject(error);
-          });
-      });
     }
   }
 });

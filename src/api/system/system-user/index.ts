@@ -4,13 +4,14 @@ const {
   VITE_CLIENT_SECRET,
   VITE_GRANT_TYPE_PASSWORD,
   VITE_GRANT_TYPE_PHONE,
-  VITE_GRANT_TYPE_PORTAL,
+  VITE_GRANT_TYPE_REFRESH,
   VITE_SCOPE
 } = import.meta.env;
 import { ContentTypeEnum } from "@/enums/httpEnum";
 
 import type {
   LoginParams,
+  LoginRefreshParams,
   LoginResultModel,
   GetUserInfoModel,
   LoginByPhoneParams
@@ -29,7 +30,22 @@ export const loginApi = (params: LoginParams) => {
     TwoFactorCode: params.twoFactorCode
   };
   return http.post<LoginResultModel>("connect/token", {
-    params: tokenParams,
+    data: tokenParams,
+    headers: {
+      "Content-Type": ContentTypeEnum.FORM_URLENCODED
+    }
+  });
+};
+
+export const loginRefreshApi = (params: LoginRefreshParams) => {
+  const tokenParams = {
+    client_id: VITE_CLIENT_ID,
+    client_secret: VITE_CLIENT_SECRET,
+    grant_type: VITE_GRANT_TYPE_REFRESH,
+    refreshToken: params.refreshToken
+  };
+  return http.post<LoginResultModel>("connect/token", {
+    data: tokenParams,
     headers: {
       "Content-Type": ContentTypeEnum.FORM_URLENCODED
     }
@@ -45,7 +61,7 @@ export const loginPhoneApi = (params: LoginByPhoneParams) => {
     phone_verify_code: params.code
   };
   return http.post<LoginResultModel>("connect/token", {
-    params: tokenParams,
+    data: tokenParams,
     headers: {
       "Content-Type": ContentTypeEnum.FORM_URLENCODED
     }

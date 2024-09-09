@@ -9,6 +9,10 @@ export interface LoginParams {
   enterpriseId?: string;
 }
 
+export interface LoginRefreshParams {
+  refreshToken: string;
+}
+
 export interface LoginByPhoneParams {
   phoneNumber: string;
   code: string;

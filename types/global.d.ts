@@ -76,6 +76,7 @@ declare global {
     VITE_GRANT_TYPE_PASSWORD: string;
     VITE_GRANT_TYPE_PHONE: string;
     VITE_GRANT_TYPE_PORTAL: string;
+    VITE_GRANT_TYPE_REFRESH: string;
     VITE_API: string;
   }
 

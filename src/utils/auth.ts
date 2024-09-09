@@ -12,7 +12,7 @@ import {
 import type { tokenType } from "@/store/types";
 
 /** 获取`token` */
-export const getToken = () => {
+export const getAuthToken = () => {
   const tokenString = Cookies.get(`${TOKEN_KEY}`);
   const retokenString = Cookies.get(`${REFRESH_TOKEN_KEY}`);
   const tokenData = tokenString ? JSON.parse(tokenString) : null;
@@ -41,7 +41,7 @@ export const getToken = () => {
  * 将`accessToken`、`expires`、`refreshToken`这三条信息cookie里（过期自动销毁）
  * 将`refreshToken`、`expires`信息放在localStorage里（利用`multipleTabsKey`当浏览器完全关闭后自动销毁）
  */
-export const setToken = (data: tokenType) => {
+export const setAuthToken = (data: tokenType) => {
   const { isRemembered, loginDay } = useUserStoreHook();
   const { accessToken, refreshToken, expires } = data;
   // 计算过期时间戳（毫秒）
@@ -79,7 +79,7 @@ export const setToken = (data: tokenType) => {
   });
 };
 
-export const removeToken = () => {
+export const removeAuthToken = () => {
   Cookies.remove(TOKEN_KEY);
   Cookies.remove(REFRESH_TOKEN_KEY);
   Cookies.remove(MULTIPLE_TABS_KEY);
@@ -91,7 +91,7 @@ export const removeToken = () => {
 };
 
 /** 是否有按钮级别的权限（根据登录接口返回的`permissions`字段进行判断）*/
-export const hasPerms = (value: string | Array<string>): boolean => {
+export const hasAuthPerms = (value: string | Array<string>): boolean => {
   if (!value) return false;
   const allPerms = "*:*:*";
   const { permissions } = useUserStoreHook();

@@ -64,6 +64,7 @@ const wrapperEnv = (envConf: Recordable): ViteEnv => {
     VITE_GRANT_TYPE_PASSWORD: "password",
     VITE_GRANT_TYPE_PHONE: "phone_verify",
     VITE_GRANT_TYPE_PORTAL: "portal",
+    VITE_GRANT_TYPE_REFRESH: "refresh_token",
     VITE_API: "http://127.0.0.1:44385"
   };
 
