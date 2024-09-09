@@ -38,18 +38,18 @@ export function useNav() {
     };
   });
 
+  const userInfo = useUserStoreHook().getUserInfo;
+
   /** 头像（如果头像为空则使用 src/assets/user.jpg ） */
   const userAvatar = computed(() => {
-    return isAllEmpty(useUserStoreHook()?.avatar)
-      ? Avatar
-      : useUserStoreHook()?.avatar;
+    return isAllEmpty(userInfo?.avatar) ? Avatar : userInfo?.avatar;
   });
 
   /** 昵称（如果昵称为空则显示用户名） */
   const username = computed(() => {
-    return isAllEmpty(useUserStoreHook()?.nickname)
-      ? useUserStoreHook()?.username
-      : useUserStoreHook()?.nickname;
+    return isAllEmpty(userInfo?.nickname)
+      ? userInfo?.username
+      : userInfo?.nickname;
   });
 
   /** 设置国际化选中后的样式 */

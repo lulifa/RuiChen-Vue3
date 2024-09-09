@@ -41,9 +41,6 @@ export type userType = {
   userInfo: Nullable<GetUserInfoModel>;
   /** sso标记,用于后台退出 */
   sso?: boolean;
-  avatar?: string;
-  username?: string;
-  nickname?: string;
   roles?: Array<string>;
   permissions?: Array<string>;
   isRemembered?: boolean;
