@@ -2,17 +2,14 @@ import Cookies from "js-cookie";
 import { useUserStoreHook } from "@/store/modules/user";
 import { storageLocal, isString, isIncludeAllChildren } from "@pureadmin/utils";
 import {
-  PERMISSIONS_KEY,
   REFRESH_TOKEN_KEY,
-  ROLES_KEY,
   TOKEN_KEY,
-  USER_INFO_KEY,
   MULTIPLE_TABS_KEY
 } from "@/enums/cacheEnum";
 import type { tokenType } from "@/store/types";
 
 /** 获取`token` */
-export const getAuthToken = () => {
+export const getToken = () => {
   const tokenString = Cookies.get(`${TOKEN_KEY}`);
   const retokenString = Cookies.get(`${REFRESH_TOKEN_KEY}`);
   const tokenData = tokenString ? JSON.parse(tokenString) : null;
@@ -41,7 +38,7 @@ export const getAuthToken = () => {
  * 将`accessToken`、`expires`、`refreshToken`这三条信息cookie里（过期自动销毁）
  * 将`refreshToken`、`expires`信息放在localStorage里（利用`multipleTabsKey`当浏览器完全关闭后自动销毁）
  */
-export const setAuthToken = (data: tokenType) => {
+export const setToken = (data: tokenType) => {
   const { isRemembered, loginDay } = useUserStoreHook();
   const { accessToken, refreshToken, expires } = data;
   // 计算过期时间戳（毫秒）
@@ -79,19 +76,19 @@ export const setAuthToken = (data: tokenType) => {
   });
 };
 
-export const removeAuthToken = () => {
+export const removeToken = () => {
   Cookies.remove(TOKEN_KEY);
   Cookies.remove(REFRESH_TOKEN_KEY);
   Cookies.remove(MULTIPLE_TABS_KEY);
-
   storageLocal().removeItem(REFRESH_TOKEN_KEY);
-  storageLocal().removeItem(USER_INFO_KEY);
-  storageLocal().removeItem(ROLES_KEY);
-  storageLocal().removeItem(PERMISSIONS_KEY);
+};
+
+export const formatToken = (token: string) => {
+  return "Bearer " + token;
 };
 
 /** 是否有按钮级别的权限（根据登录接口返回的`permissions`字段进行判断）*/
-export const hasAuthPerms = (value: string | Array<string>): boolean => {
+export const hasPerms = (value: string | Array<string>): boolean => {
   if (!value) return false;
   const allPerms = "*:*:*";
   const { permissions } = useUserStoreHook();

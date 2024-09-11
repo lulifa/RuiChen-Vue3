@@ -12,6 +12,7 @@ import type {
 import { stringify } from "qs";
 import NProgress from "../progress";
 import { useUserStoreHook } from "@/store/modules/user";
+import { getToken, formatToken } from "@/utils/auth";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -50,7 +51,7 @@ class PureHttp {
   private static retryOriginalRequest(config: PureHttpRequestConfig) {
     return new Promise(resolve => {
       PureHttp.requests.push((token: string) => {
-        config.headers["Authorization"] = useUserStoreHook().formatToken(token);
+        config.headers["Authorization"] = formatToken(token);
         resolve(config);
       });
     });
@@ -76,7 +77,7 @@ class PureHttp {
         return whiteList.some(url => config.url.endsWith(url))
           ? config
           : new Promise(resolve => {
-              const data = useUserStoreHook().getToken;
+              const data = getToken();
               if (data) {
                 const expired = parseInt(data.expires) - Date.now() <= 0;
                 if (expired) {
@@ -87,8 +88,7 @@ class PureHttp {
                       .handRefreshToken({ refreshToken: data.refreshToken })
                       .then(res => {
                         const token = res.access_token;
-                        config.headers["Authorization"] =
-                          useUserStoreHook().formatToken(token);
+                        config.headers["Authorization"] = formatToken(token);
                         PureHttp.requests.forEach(cb => cb(token));
                         PureHttp.requests = [];
                       })
@@ -98,8 +98,9 @@ class PureHttp {
                   }
                   resolve(PureHttp.retryOriginalRequest(config));
                 } else {
-                  config.headers["Authorization"] =
-                    useUserStoreHook().formatToken(data.accessToken);
+                  config.headers["Authorization"] = formatToken(
+                    data.accessToken
+                  );
                   resolve(config);
                 }
               } else {

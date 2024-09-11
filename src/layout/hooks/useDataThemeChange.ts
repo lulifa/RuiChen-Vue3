@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { getConfig } from "@/config";
 import { useLayout } from "./useLayout";
-import { useUserStoreHook } from "@/store/modules/user";
+import { removeToken } from "@/utils/auth";
 import { routerArrays } from "@/layout/types";
 import { router, resetRouter } from "@/router";
 import type { themeColorsType } from "../types";
@@ -117,7 +117,7 @@ export function useDataThemeChange() {
 
   /** 清空缓存并返回登录页 */
   function onReset() {
-    useUserStoreHook().removeToken();
+    removeToken();
     storageLocal().clear();
     const { Grey, Weak, MultiTagsCache, EpThemeColor, Layout } = getConfig();
     useAppStoreHook().setLayout(Layout);

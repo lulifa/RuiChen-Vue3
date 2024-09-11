@@ -26,6 +26,7 @@ import {
   type RouteComponent
 } from "vue-router";
 import { useUserStoreHook } from "@/store/modules/user";
+import { removeToken } from "@/utils/auth";
 import { MULTIPLE_TABS_KEY } from "@/enums/cacheEnum";
 
 /** 自动导入全部静态路由，无需再手动引入！匹配 src/router/modules 目录（任何嵌套级别）中具有 .ts 扩展名的所有文件，除了 remaining.ts 文件
@@ -188,7 +189,7 @@ router.beforeEach((to: ToRouteType, _from, next) => {
       if (whiteList.indexOf(to.path) !== -1) {
         next();
       } else {
-        useUserStoreHook().removeToken();
+        removeToken();
         next({ path: "/login" });
       }
     } else {

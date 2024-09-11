@@ -1,3 +1,9 @@
+export const ABP_TENANT_KEY = "ABP_TENANT_";
+
+export const ABP_APP_KEY = "ABP_APP_";
+
+export const ABP_API_KEY = "ABP_API_";
+
 export const TOKEN_KEY = "TOKEN__";
 
 export const REFRESH_TOKEN_KEY = "REFRESH_TOKEN_";

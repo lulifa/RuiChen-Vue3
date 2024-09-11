@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
 import { USER_INFO_KEY, ROLES_KEY, PERMISSIONS_KEY } from "@/enums/cacheEnum";
+import { useAbpStoreWithOut } from "./abp";
 
 import {
   type userType,
-  type tokenType,
   store,
   router,
   resetRouter,
@@ -14,7 +14,7 @@ import {
   loginApi,
   loginRefreshApi,
   loginPhoneApi,
-  getUserInfo
+  getUserInfoApi
 } from "@/api/system/system-user";
 import type {
   LoginParams,
@@ -23,12 +23,10 @@ import type {
   GetUserInfoModel
 } from "@/api/system/system-user/model";
 import { useMultiTagsStoreHook } from "./multiTags";
-import {
-  setAuthToken,
-  removeAuthToken,
-  getAuthToken,
-  hasAuthPerms
-} from "@/utils/auth";
+import { setToken, removeToken } from "@/utils/auth";
+
+const ls = storageLocal();
+const abpStore = useAbpStoreWithOut();
 
 export const useUserStore = defineStore({
   id: "pure-user",
@@ -47,27 +45,19 @@ export const useUserStore = defineStore({
     loginDay: 7
   }),
   getters: {
-    getToken(): tokenType {
-      return getAuthToken();
-    },
     getUserInfo(state): GetUserInfoModel {
-      return (
-        state.userInfo ||
-        storageLocal().getItem<GetUserInfoModel>(USER_INFO_KEY)
-      );
+      return state.userInfo || ls.getItem<GetUserInfoModel>(USER_INFO_KEY);
     },
     getSso(state): boolean {
       return state.sso === true;
     },
     getRoles(state): Array<string> {
-      return state.roles.length > 0
-        ? state.roles
-        : storageLocal().getItem(ROLES_KEY);
+      return state.roles.length > 0 ? state.roles : ls.getItem(ROLES_KEY);
     },
     getPermissions(state): Array<string> {
       return state.permissions.length > 0
         ? state.permissions
-        : storageLocal().getItem(PERMISSIONS_KEY);
+        : ls.getItem(PERMISSIONS_KEY);
     },
     getVerifyCode(state): string {
       return state.verifyCode;
@@ -83,23 +73,29 @@ export const useUserStore = defineStore({
     }
   },
   actions: {
-    setToken(data: tokenType) {
-      setAuthToken(data);
-    },
-    removeToken() {
-      removeAuthToken();
-    },
     setUserInfo(userInfo: GetUserInfoModel) {
       this.userInfo = userInfo;
-      storageLocal().setItem(USER_INFO_KEY, userInfo);
+      ls.setItem(USER_INFO_KEY, userInfo);
+    },
+    removeUserInfo() {
+      this.userInfo = null;
+      ls.removeItem(USER_INFO_KEY);
     },
     setRoles(roles: Array<string>) {
       this.roles = roles;
-      storageLocal().setItem(ROLES_KEY, roles);
+      ls.setItem(ROLES_KEY, roles);
+    },
+    removeRoles() {
+      this.roles = [];
+      ls.removeItem(ROLES_KEY);
     },
     setPermissions(permissions: Array<string>) {
       this.permissions = permissions;
-      storageLocal().setItem(PERMISSIONS_KEY, permissions);
+      ls.setItem(PERMISSIONS_KEY, permissions);
+    },
+    removePermissions() {
+      this.permissions = [];
+      ls.removeItem(PERMISSIONS_KEY);
     },
     /** 存储前端生成的验证码 */
     setVerifyCode(verifyCode: string) {
@@ -115,12 +111,6 @@ export const useUserStore = defineStore({
     setLoginDay(value: number) {
       this.loginDay = Number(value);
     },
-    formatToken(token: string) {
-      return "Bearer " + token;
-    },
-    hasPerms(value: string | Array<string>): boolean {
-      return hasAuthPerms(value);
-    },
     /** 登入 */
     async loginApi(params: LoginParams): Promise<LoginResultModel> {
       try {
@@ -131,10 +121,11 @@ export const useUserStore = defineStore({
             refreshToken: res.refresh_token,
             expires: res.expires_in
           };
-          await this.setToken(openiddictToken);
+          setToken(openiddictToken);
           await this.getUserInfoAction();
+
+          return res;
         }
-        return res;
       } catch (error) {
         throw error;
       }
@@ -150,7 +141,7 @@ export const useUserStore = defineStore({
             refreshToken: res.refresh_token,
             expires: res.expires_in
           };
-          await this.setToken(openiddictToken);
+          setToken(openiddictToken);
           await this.getUserInfoAction();
         }
         return res;
@@ -169,7 +160,7 @@ export const useUserStore = defineStore({
             refreshToken: res.refresh_token,
             expires: res.expires_in
           };
-          await this.setToken(openiddictToken);
+          setToken(openiddictToken);
           await this.getUserInfoAction();
         }
 
@@ -178,10 +169,18 @@ export const useUserStore = defineStore({
         throw error;
       }
     },
-    async getUserInfoAction() {
-      const userInfo = await getUserInfo();
+    async getUserInfoAction(): Promise<GetUserInfoModel> {
+      const userInfo = await getUserInfoApi();
       // TODO  获取abpStore 初始化abp相关代码
-      let currentUser = userInfo;
+      const abpStore = useAbpStoreWithOut();
+
+      let currentUser = abpStore.getApplication.currentUser;
+      //  避免多次请求接口
+      if (userInfo?.sub !== currentUser.id) {
+        await abpStore.initlizeAbpApplication();
+        currentUser = abpStore.getApplication.currentUser;
+      }
+
       const outgoingUserInfo: { [key: string]: any } = {
         // 从 currentuser 接口获取
         userId: currentUser.id,
@@ -211,10 +210,12 @@ export const useUserStore = defineStore({
     },
     /** 前端登出（不调用接口） */
     logOut() {
-      this.userinfo = null;
-      this.roles = [];
-      this.permissions = [];
-      this.removeToken();
+      removeToken();
+      this.removeUserInfo();
+      this.removeRoles();
+      this.removePermissions();
+      abpStore.removeApplication();
+      abpStore.removeApiDefinition();
       useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
       resetRouter();
       router.push("/login");

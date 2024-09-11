@@ -8,6 +8,7 @@ import { MotionPlugin } from "@vueuse/motion";
 import { createApp, type Directive } from "vue";
 import { useElementPlus } from "@/plugins/elementPlus";
 import { injectResponsiveStorage } from "@/utils/responsive";
+import { useAbpStore } from "@/store/modules/abp";
 
 import Table from "@pureadmin/table";
 // import PureDescriptions from "@pureadmin/descriptions";
@@ -58,6 +59,11 @@ getPlatformConfig(app).then(async config => {
   app.use(router);
   await router.isReady();
   injectResponsiveStorage(app, config);
+
+  // abp默认初始化配置加载
+  await useAbpStore().initlizeAbpApplication();
+  await useAbpStore().initlizaAbpApiDefinition();
+
   app.use(MotionPlugin).use(useI18n).use(useElementPlus).use(Table);
   // .use(PureDescriptions)
   // .use(useEcharts);

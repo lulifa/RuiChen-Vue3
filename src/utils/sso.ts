@@ -1,4 +1,4 @@
-import { useUserStoreHook } from "@/store/modules/user";
+import { setToken, removeToken } from "@/utils/auth";
 import type { userType, tokenType } from "@/store/types";
 import { subBefore, getQueryMap } from "@pureadmin/utils";
 
@@ -37,10 +37,10 @@ type UserWithTokenType = userType & tokenType;
     // 判定为单点登录
 
     // 清空本地旧信息
-    useUserStoreHook().removeToken();
+    removeToken();
 
     // 保存新信息到本地
-    useUserStoreHook().setToken(params);
+    setToken(params);
 
     // 删除不需要显示在 url 的参数
     delete params.roles;

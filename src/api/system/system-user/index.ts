@@ -68,6 +68,6 @@ export const loginPhoneApi = (params: LoginByPhoneParams) => {
   });
 };
 
-export const getUserInfo = () => {
+export const getUserInfoApi = () => {
   return http.get<GetUserInfoModel>("connect/userinfo");
 };

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useUserStoreHook } from "@/store/modules/user";
+import { hasPerms } from "@/utils/auth";
 
 const { permissions } = useUserStoreHook();
 
@@ -50,15 +51,11 @@ defineOptions({
         <div class="card-header">函数方式判断权限</div>
       </template>
       <el-space wrap>
-        <el-button
-          v-if="useUserStoreHook().hasPerms('permission:btn:add')"
-          plain
-          type="warning"
-        >
+        <el-button v-if="hasPerms('permission:btn:add')" plain type="warning">
           拥有code：'permission:btn:add' 权限可见
         </el-button>
         <el-button
-          v-if="useUserStoreHook().hasPerms(['permission:btn:edit'])"
+          v-if="hasPerms(['permission:btn:edit'])"
           plain
           type="primary"
         >
@@ -66,7 +63,7 @@ defineOptions({
         </el-button>
         <el-button
           v-if="
-            useUserStoreHook().hasPerms([
+            hasPerms([
               'permission:btn:add',
               'permission:btn:edit',
               'permission:btn:delete'
