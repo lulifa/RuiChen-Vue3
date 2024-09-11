@@ -1,6 +1,7 @@
 import type { FormInstance, FormItemProp } from "element-plus";
 import { clone } from "@pureadmin/utils";
 import { ref } from "vue";
+import { sendPhoneSigninCode } from "@/api/account/account-base";
 
 const isDisabled = ref(false);
 const timer = ref(null);
@@ -14,8 +15,14 @@ export const useVerifyCode = () => {
   ) => {
     if (!formEl) return;
     const initTime = clone(time, true);
-    await formEl.validateField(props, isValid => {
+    await formEl.validateField(props, async isValid => {
       if (isValid) {
+        // 发送验证码请求
+
+        const phoneNumber = formEl.$props.model[props as string];
+
+        await sendPhoneSigninCode({ phoneNumber: phoneNumber });
+
         clearInterval(timer.value);
         isDisabled.value = true;
         text.value = `${time}`;

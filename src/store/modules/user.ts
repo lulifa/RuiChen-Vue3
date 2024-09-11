@@ -13,11 +13,13 @@ import {
 import {
   loginApi,
   loginRefreshApi,
+  loginPhoneApi,
   getUserInfo
 } from "@/api/system/system-user";
 import type {
   LoginParams,
   LoginResultModel,
+  LoginByPhoneParams,
   GetUserInfoModel
 } from "@/api/system/system-user/model";
 import { useMultiTagsStoreHook } from "./multiTags";
@@ -123,6 +125,25 @@ export const useUserStore = defineStore({
     async loginApi(params: LoginParams): Promise<LoginResultModel> {
       try {
         const res = await loginApi(params);
+        if (res.access_token && res.refresh_token) {
+          const openiddictToken = {
+            accessToken: res.access_token,
+            refreshToken: res.refresh_token,
+            expires: res.expires_in
+          };
+          await this.setToken(openiddictToken);
+          await this.getUserInfoAction();
+        }
+        return res;
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    /** 手机 登入 */
+    async loginPhoneApi(params: LoginByPhoneParams): Promise<LoginResultModel> {
+      try {
+        const res = await loginPhoneApi(params);
         if (res.access_token && res.refresh_token) {
           const openiddictToken = {
             accessToken: res.access_token,

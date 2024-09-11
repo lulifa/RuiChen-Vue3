@@ -2,6 +2,7 @@
 import { useI18n } from "vue-i18n";
 import { ref, reactive } from "vue";
 import Motion from "../utils/motion";
+import { useRouter } from "vue-router";
 import { message } from "@/utils/message";
 import { phoneRules } from "../utils/rule";
 import type { FormInstance } from "element-plus";
@@ -10,6 +11,8 @@ import { useVerifyCode } from "../utils/verifyCode";
 import { useUserStoreHook } from "@/store/modules/user";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Iphone from "@iconify-icons/ep/iphone";
+import { loginPhoneApi } from "@/api/system/system-user";
+import { initRouter, getTopMenu } from "@/router/utils";
 
 const { t } = useI18n();
 const loading = ref(false);
@@ -19,21 +22,38 @@ const ruleForm = reactive({
 });
 const ruleFormRef = ref<FormInstance>();
 const { isDisabled, text } = useVerifyCode();
+const router = useRouter();
 
 const onLogin = async (formEl: FormInstance | undefined) => {
-  loading.value = true;
   if (!formEl) return;
-  await formEl.validate(valid => {
+  await formEl.validate(async valid => {
     if (valid) {
-      // 模拟登录请求，需根据实际开发进行修改
-      setTimeout(() => {
-        message(transformI18n($t("login.pureLoginSuccess")), {
-          type: "success"
+      loading.value = true;
+      try {
+        debugger;
+        // 模拟登录请求，需根据实际开发进行修改
+        const res = await loginPhoneApi({
+          phoneNumber: ruleForm.phone,
+          code: ruleForm.verifyCode
         });
+        if (res.access_token && res.refresh_token) {
+          // 初始化路由
+          await initRouter();
+
+          const targetPath = getTopMenu(true).path;
+
+          await router.push(targetPath);
+
+          message(transformI18n($t("login.pureLoginSuccess")), {
+            type: "success"
+          });
+        } else {
+          message(t("login.pureLoginFail"), { type: "error" });
+        }
+      } finally {
+        // 无论成功与否，恢复 loading 状态
         loading.value = false;
-      }, 2000);
-    } else {
-      loading.value = false;
+      }
     }
   });
 };
