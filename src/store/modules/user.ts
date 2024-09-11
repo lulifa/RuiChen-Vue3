@@ -173,7 +173,6 @@ export const useUserStore = defineStore({
       const userInfo = await getUserInfoApi();
       // TODO  获取abpStore 初始化abp相关代码
       const abpStore = useAbpStoreWithOut();
-
       let currentUser = abpStore.getApplication.currentUser;
       //  避免多次请求接口
       if (userInfo?.sub !== currentUser.id) {

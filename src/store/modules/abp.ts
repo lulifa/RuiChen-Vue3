@@ -4,9 +4,17 @@ import { i18n } from "@/plugins/i18n";
 import { store, storageLocal } from "../utils";
 import { getApplicationConfiguration } from "@/api/abp/abp-configuration";
 import { getApiDefinition } from "@/api/abp/abp-definition";
-import type { ApplicationApiDescriptionModel } from "@/api/abp/abp-definition/model";
+import { ApplicationApiDescriptionModel } from "@/api/abp/abp-definition/model";
 
 const ls = storageLocal();
+
+const defaultApp = {};
+const defaultApi = new ApplicationApiDescriptionModel();
+
+const lsApplication = (ls.getItem(ABP_APP_KEY) ||
+  defaultApp) as ApplicationConfigurationDto;
+const lsApiDefinition = (ls.getItem(ABP_API_KEY) ||
+  defaultApi) as ApplicationApiDescriptionModel;
 
 interface AbpState {
   application: ApplicationConfigurationDto;
@@ -16,8 +24,8 @@ interface AbpState {
 export const useAbpStore = defineStore({
   id: "abp",
   state: (): AbpState => ({
-    application: null,
-    apidefinition: null
+    application: lsApplication,
+    apidefinition: lsApiDefinition
   }),
   getters: {
     getApplication(state): ApplicationConfigurationDto {
@@ -33,7 +41,7 @@ export const useAbpStore = defineStore({
       ls.setItem(ABP_APP_KEY, application);
     },
     removeApplication() {
-      this.application = null;
+      this.application = lsApplication;
       ls.removeItem(ABP_APP_KEY);
     },
     setApiDefinition(apidefinition: ApplicationApiDescriptionModel) {
@@ -41,7 +49,7 @@ export const useAbpStore = defineStore({
       ls.setItem(ABP_API_KEY, apidefinition);
     },
     removeApiDefinition() {
-      this.definition = null;
+      this.definition = lsApiDefinition;
       ls.removeItem(ABP_API_KEY);
     },
     mergeLocaleMessage(localization: ApplicationLocalizationConfigurationDto) {
