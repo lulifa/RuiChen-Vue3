@@ -1,6 +1,5 @@
 import "./reset.css";
 import dayjs from "dayjs";
-import roleForm from "../form/role.vue";
 import editForm from "../form/index.vue";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import { handleTree } from "@/utils/tree";
@@ -10,19 +9,14 @@ import { usePublicHooks } from "../../hooks";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
 import ReCropperPreview from "@/components/ReCropperPreview";
-import type { FormItemProps, RoleFormItemProps } from "../utils/types";
+import type { FormItemProps } from "../utils/types";
 import {
   getKeyList,
   isAllEmpty,
   hideTextAtIndex,
   deviceDetection
 } from "@pureadmin/utils";
-import {
-  getRoleIds,
-  getDeptList,
-  getUserList,
-  getAllRoleList
-} from "@/api/system";
+import { getDeptList, getUserList, getAllRoleList } from "@/api/system";
 import {
   ElForm,
   ElInput,
@@ -463,35 +457,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     });
   }
 
-  /** 分配角色 */
-  async function handleRole(row) {
-    // 选中的角色列表
-    const ids = (await getRoleIds({ userId: row.id })).data ?? [];
-    addDialog({
-      title: `分配 ${row.username} 用户的角色`,
-      props: {
-        formInline: {
-          username: row?.username ?? "",
-          nickname: row?.nickname ?? "",
-          roleOptions: roleOptions.value ?? [],
-          ids
-        }
-      },
-      width: "400px",
-      draggable: true,
-      fullscreen: deviceDetection(),
-      fullscreenIcon: true,
-      closeOnClickModal: false,
-      contentRenderer: () => h(roleForm),
-      beforeSure: (done, { options }) => {
-        const curData = options.props.formInline as RoleFormItemProps;
-        console.log("curIds", curData.ids);
-        // 根据实际业务使用curData.ids和row里的某些字段去调用修改角色接口即可
-        done(); // 关闭弹框
-      }
-    });
-  }
-
   onMounted(async () => {
     treeLoading.value = true;
     onSearch();
@@ -526,7 +491,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     handleDelete,
     handleUpload,
     handleReset,
-    handleRole,
     handleSizeChange,
     onSelectionCancel,
     handleCurrentChange,

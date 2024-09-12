@@ -9,7 +9,7 @@ export default {
     {
       path: "/system/user/index",
       name: "SystemUser",
-      component: () => import("@/views/system/user/index.vue"),
+      component: () => import("@/views/identity/user/index.vue"),
       meta: {
         icon: "ri:admin-line",
         title: "用户管理",

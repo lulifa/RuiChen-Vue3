@@ -42,7 +42,6 @@ const {
   handleDelete,
   handleUpload,
   handleReset,
-  handleRole,
   handleSizeChange,
   onSelectionCancel,
   handleCurrentChange,
@@ -229,18 +228,6 @@ const {
                         @click="handleReset(row)"
                       >
                         重置密码
-                      </el-button>
-                    </el-dropdown-item>
-                    <el-dropdown-item>
-                      <el-button
-                        :class="buttonClass"
-                        link
-                        type="primary"
-                        :size="size"
-                        :icon="useRenderIcon(Role)"
-                        @click="handleRole(row)"
-                      >
-                        分配角色
                       </el-button>
                     </el-dropdown-item>
                   </el-dropdown-menu>
