@@ -20,6 +20,7 @@ import type {
   LoginParams,
   LoginResultModel,
   LoginByPhoneParams,
+  LoginRefreshParams,
   GetUserInfoModel
 } from "@/api/system/system-user/model";
 import { useMultiTagsStoreHook } from "./multiTags";
@@ -151,7 +152,9 @@ export const useUserStore = defineStore({
     },
 
     /** 刷新 token */
-    async handRefreshToken(params: any): Promise<LoginResultModel> {
+    async handRefreshToken(
+      params: LoginRefreshParams
+    ): Promise<LoginResultModel> {
       try {
         const res = await loginRefreshApi(params);
         if (res.access_token && res.refresh_token) {

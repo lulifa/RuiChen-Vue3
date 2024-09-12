@@ -42,7 +42,7 @@ export const loginRefreshApi = (params: LoginRefreshParams) => {
     client_id: VITE_CLIENT_ID,
     client_secret: VITE_CLIENT_SECRET,
     grant_type: VITE_GRANT_TYPE_REFRESH,
-    refreshToken: params.refreshToken
+    refresh_token: params.refreshToken
   };
   return http.post<LoginResultModel>("connect/token", {
     data: tokenParams,
