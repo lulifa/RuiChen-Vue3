@@ -85,7 +85,7 @@ export const useAbpStore = defineStore({
     async initlizeAbpApplication() {
       const application = await getApplicationConfiguration();
       this.setApplication(application);
-
+      // 多语言合并设置 TO  多语言提示要怎么兼容下
       const { localization } = application;
       this.mergeLocaleMessage(localization);
     },
