@@ -1,6 +1,6 @@
 import "./reset.css";
 import dayjs from "dayjs";
-import editForm from "../form/index.vue";
+import editForm from "../form.vue";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";

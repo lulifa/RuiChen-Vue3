@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import ReCol from "@/components/ReCol";
-import { formRules } from "../utils/rule";
-import { FormProps } from "../utils/types";
+import { formRules } from "./utils/rule";
+import { FormProps } from "./utils/types";
 import Segmented from "@/components/ReSegmented";
-import { menuTypeOptions } from "../utils/enums";
-import { usePublicHooks } from "../../hooks";
+import { menuTypeOptions } from "./utils/enums";
+import { usePublicHooks } from "../hooks";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Lock from "@iconify-icons/ri/lock-fill";
 
