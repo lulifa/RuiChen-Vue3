@@ -67,31 +67,38 @@ const {
         :model="form"
         class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
       >
+        <el-form-item label="高级搜索：" style="width: 96%">
+          <el-input
+            v-model="form.filter"
+            placeholder="请输入搜索内容，常见的用户字段都可以用高级搜索进行查询，比如用户名称、姓氏、名称、电子邮箱、电话号码等字段"
+            clearable
+          />
+        </el-form-item>
         <el-form-item label="用户名称：" prop="username">
           <el-input
-            v-model="form.username"
+            v-model="form.userName"
             placeholder="请输入用户名称"
             clearable
             class="!w-[180px]"
           />
         </el-form-item>
-        <el-form-item label="手机号码：" prop="phone">
+        <el-form-item label="电话号码：" prop="phoneNumber">
           <el-input
-            v-model="form.phone"
-            placeholder="请输入手机号码"
+            v-model="form.phoneNumber"
+            placeholder="请输入电话号码"
             clearable
             class="!w-[180px]"
           />
         </el-form-item>
-        <el-form-item label="状态：" prop="status">
+        <el-form-item label="状态：" prop="isActive">
           <el-select
-            v-model="form.status"
+            v-model="form.isActive"
             placeholder="请选择"
             clearable
             class="!w-[180px]"
           >
-            <el-option label="已开启" value="1" />
-            <el-option label="已关闭" value="0" />
+            <el-option label="已启用" value="true" />
+            <el-option label="已禁用" value="false" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -109,11 +116,7 @@ const {
         </el-form-item>
       </el-form>
 
-      <PureTableBar
-        title="用户管理（仅演示，操作后不生效）"
-        :columns="columns"
-        @refresh="onSearch"
-      >
+      <PureTableBar title="" :columns="columns" @refresh="onSearch">
         <template #buttons>
           <el-button
             type="primary"

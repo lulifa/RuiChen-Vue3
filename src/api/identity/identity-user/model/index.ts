@@ -34,6 +34,7 @@ export interface IdentityUserOrganizationUnitUpdateDto {
 /** 用户对象 */
 export interface User
   extends FullAuditedEntityDto<string>,
+    ExtensibleObject,
     IUser,
     IHasConcurrencyStamp {
   /** 租户标识 */
