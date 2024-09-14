@@ -15,7 +15,6 @@ import {
   hideTextAtIndex,
   deviceDetection
 } from "@pureadmin/utils";
-import { getDeptList, getAllRoleList } from "@/api/system";
 import { ElForm, ElInput, ElFormItem, ElProgress } from "element-plus";
 import {
   type Ref,
@@ -35,21 +34,23 @@ import {
   create,
   deleteById,
   update,
-  getList
+  getList,
+  getOrganizationUnits
 } from "@/api/identity/identity-user";
 import type { GetUserPagedRequest } from "@/api/identity/identity-user/model";
+import { getAll as getAllOrganizationUnits } from "@/api/identity/identity-organizationunit";
 
 export function useUser(tableRef: Ref, treeRef: Ref) {
   interface CustomForm extends GetUserPagedRequest {
     // 添加自定义字段
-    deptId: string;
+    organizationUnitId: string;
     userName: string;
     phoneNumber: string;
     isActive: boolean;
   }
   const form = reactive<CustomForm>({
     // 左侧部门树的id
-    deptId: "",
+    organizationUnitId: null,
     userName: "",
     phoneNumber: "",
     isActive: null
@@ -170,7 +171,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   ];
   // 当前密码强度（0-4）
   const curScore = ref();
-  const roleOptions = ref([]);
 
   function handleUpdate(row) {
     console.log(row);
@@ -232,13 +232,13 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const resetForm = formEl => {
     if (!formEl) return;
     formEl.resetFields();
-    form.deptId = "";
+    form.organizationUnitId = null;
     treeRef.value.onTreeReset();
     onSearch();
   };
 
   function onTreeSelect({ id, selected }) {
-    form.deptId = selected ? id : "";
+    form.organizationUnitId = selected ? id : "";
     onSearch();
   }
 
@@ -311,11 +311,11 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         lockoutEnabled: true,
         twoFactorEnabled: true,
         isActive: true,
-        roleOptions: []
+        roleOptions: [],
+        organizationunitKeys: [],
+        higherDeptOptions: formatHigherDeptOptions(higherDeptOptions.value)
       }
     };
-    console.log(title + row?.email);
-    console.log(formatHigherDeptOptions(higherDeptOptions.value));
     const roles = await getAssignableRoles();
     if (roles) {
       props.formInline.roleOptions = roles.items;
@@ -323,7 +323,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     if (title !== "新增") {
       const res = await getById(row?.id);
       if (res) {
-        debugger;
         props.formInline.id = res.id;
         props.formInline.userName = res.userName;
         props.formInline.name = res.name;
@@ -341,6 +340,13 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         props.formInline.roleNames = getKeyList(userRoles.items, "name");
       }
       // 获取机构信息TODO
+      const userOrganizationUnits = await getOrganizationUnits(row?.id);
+      if (userOrganizationUnits) {
+        props.formInline.organizationunitKeys = getKeyList(
+          userOrganizationUnits.items,
+          "id"
+        );
+      }
     }
     return props;
   }
@@ -454,13 +460,12 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     onSearch();
 
     // 归属部门
-    const { data } = await getDeptList();
-    higherDeptOptions.value = handleTree(data);
-    treeData.value = handleTree(data);
+    const data = await getAllOrganizationUnits();
+    const organizationunits = data.items;
+    const options = handleTree(organizationunits, "displayName");
+    higherDeptOptions.value = options;
+    treeData.value = options;
     treeLoading.value = false;
-
-    // 角色列表
-    roleOptions.value = (await getAllRoleList()).data;
   });
 
   return {

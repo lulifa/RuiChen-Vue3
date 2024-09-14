@@ -136,6 +136,7 @@ export const appendFieldByUniqueId = (
  */
 export const handleTree = (
   data: any[],
+  name?: string,
   id?: string,
   parentId?: string,
   children?: string
@@ -145,6 +146,7 @@ export const handleTree = (
     return [];
   }
   const config = {
+    name: name || "name",
     id: id || "id",
     parentId: parentId || "parentId",
     childrenList: children || "children"
@@ -175,6 +177,8 @@ export const handleTree = (
   }
 
   function adaptToChildrenList(o: Record<string, any>) {
+    // 映射name字段
+    o.name = o[config.name] || o.name;
     if (childrenListMap[o[config.id]] !== null) {
       o[config.childrenList] = childrenListMap[o[config.id]];
     }

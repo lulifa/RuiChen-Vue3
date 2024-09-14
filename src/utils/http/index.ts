@@ -13,6 +13,7 @@ import { stringify } from "qs";
 import NProgress from "../progress";
 import { useUserStoreHook } from "@/store/modules/user";
 import { getToken, formatToken } from "@/utils/auth";
+import { ResultEnum } from "@/enums/httpEnum";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -29,7 +30,24 @@ const defaultConfig: AxiosRequestConfig = {
   },
   xsrfCookieName: "XSRF-TOKEN",
   // ASP.NET Core
-  xsrfHeaderName: "RequestVerificationToken"
+  xsrfHeaderName: "RequestVerificationToken",
+  // Wrap
+  transformResponse: [
+    (data: any, headers: any) => {
+      let parseData = JSON.parse(data);
+      // 检查 ABP 包装结果标记
+      if (headers["_abpwrapresult"] === "true") {
+        const { code, result } = parseData;
+        const hasSuccess =
+          data && Reflect.has(parseData, "code") && code === ResultEnum.CODE;
+
+        if (hasSuccess) {
+          return result; // 成功则返回结果
+        }
+      }
+      return parseData; // 默认返回解析后的数据
+    }
+  ]
 };
 
 class PureHttp {

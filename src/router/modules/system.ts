@@ -16,6 +16,17 @@ export default {
         showParent: true,
         roles: ["admin"]
       }
+    },
+    {
+      path: "/system/organizationunit/index",
+      name: "SystemOrganizationUnit",
+      component: () => import("@/views/identity/organizationunit/index.vue"),
+      meta: {
+        icon: "ri:git-branch-line",
+        title: "部门管理",
+        showParent: true,
+        roles: ["admin"]
+      }
     }
   ]
 } satisfies RouteConfigsTable;
