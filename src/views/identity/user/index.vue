@@ -85,7 +85,7 @@ const {
         <el-form-item label="电话号码：" prop="phoneNumber">
           <el-input
             v-model="form.phoneNumber"
-            placeholder="请输入电话号码"
+            placeholder="请输入完整电话号码"
             clearable
             class="!w-[180px]"
           />

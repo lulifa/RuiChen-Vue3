@@ -8,6 +8,9 @@ import userAvatar from "@/assets/user.jpg";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
 import ReCropperPreview from "@/components/ReCropperPreview";
+import Check from "@iconify-icons/ep/check";
+import Close from "@iconify-icons/ep/close";
+
 import type { FormProps, FormItemProps } from "../utils/types";
 import {
   getKeyList,
@@ -70,60 +73,78 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       reserveSelection: true // 数据刷新后保留选项
     },
     {
-      label: "用户头像",
-      prop: "avatar",
-      cellRenderer: ({ row }) => (
-        <el-image
-          fit="cover"
-          preview-teleported={true}
-          src={row.avatar || userAvatar}
-          preview-src-list={Array.of(row.avatar || userAvatar)}
-          class="w-[24px] h-[24px] rounded-full align-middle"
-        />
-      ),
-      width: 90
-    },
-    {
       label: "用户名",
       prop: "userName",
-      minWidth: 130
+      minWidth: 150
     },
     {
       label: "姓氏",
       prop: "surname",
-      minWidth: 130
+      minWidth: 150
     },
     {
       label: "名称",
       prop: "name",
-      minWidth: 130
+      minWidth: 150
     },
     {
       label: "电子邮箱",
       prop: "email",
-      minWidth: 90
+      width: 150
     },
     {
       label: "手机号码",
       prop: "phoneNumber",
-      minWidth: 90,
+      width: 150,
       formatter: ({ phoneNumber }) =>
         hideTextAtIndex(phoneNumber, { start: 3, end: 6 })
     },
     {
-      label: "状态",
+      label: "启用",
       prop: "isActive",
-      minWidth: 90,
+      width: 90,
       cellRenderer: scope => (
-        <el-switch
-          v-model={scope.row.isActive}
-          active-color="#13ce66"
-          inactive-color="#ff4949"
-          active-text="已启用"
-          inactive-text="已禁用"
-          inline-prompt
-          disabled
-        />
+        <div class="flex justify-center w-full">
+          <iconifyIconOffline
+            icon={scope.row.isActive ? Check : Close}
+            style={{
+              color: scope.row.isActive ? "#13ce66" : "#ff4949",
+              fontSize: "20px"
+            }}
+          />
+        </div>
+      )
+    },
+    {
+      label: "账户锁定",
+      prop: "lockoutEnabled",
+      width: 90,
+      cellRenderer: scope => (
+        <div class="flex justify-center w-full">
+          <iconifyIconOffline
+            icon={scope.row.lockoutEnabled ? Check : Close}
+            style={{
+              color: scope.row.lockoutEnabled ? "#13ce66" : "#ff4949",
+              fontSize: "20px"
+            }}
+          />
+        </div>
+      )
+    },
+    {
+      label: "电子邮件已确认",
+      prop: "lockoutEnabled",
+      width: 150,
+      cellRenderer: scope => (
+        <div class="flex justify-center w-full">
+          <iconifyIconOffline
+            icon={scope.row.emailConfirmed ? Check : Close}
+            style={{
+              color: scope.row.emailConfirmed ? "#13ce66" : "#ff4949",
+              fontSize: "20px"
+            }}
+          />
+        </div>
       )
     },
     {
@@ -258,6 +279,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
+        debugger;
         const orgData = formRef.value.$refs.formtreeRef; // 获取树形组件的 ref
         curData.organizationUnitIds = orgData.getCheckedKeys();
         function chores() {
@@ -273,8 +295,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
-              await create(curData);
-              await setOrganizationUnits(curData.id, {
+              const user = await create(curData);
+              await setOrganizationUnits(user.id, {
                 organizationUnitIds: curData.organizationUnitIds
               });
               chores();

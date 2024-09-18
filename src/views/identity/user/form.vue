@@ -143,14 +143,7 @@ defineExpose({ getRef });
         </el-form-item>
       </re-col>
       <re-col v-show="newFormInline.menuType === 2">
-        <div
-          style="
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            margin-bottom: 20px;
-          "
-        >
+        <div class="tree-container">
           <el-tree-v2
             ref="formtreeRef"
             class="custom-tree"
@@ -184,6 +177,13 @@ defineExpose({ getRef });
 .checkbox-item {
   flex: 0 1 calc(25% - 10px); /* 四列布局，每列占容器宽度的 25% 减去间距 */
   box-sizing: border-box; /* 确保边框和内边距不会影响宽度计算 */
+}
+
+.tree-container {
+  max-width: 600px; /* 设置宽度 */
+  margin: 0 auto;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
 .custom-tree {
