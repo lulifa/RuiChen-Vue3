@@ -247,7 +247,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     if (!treeList || !treeList.length) return;
     const newTreeList = [];
     for (let i = 0; i < treeList.length; i++) {
-      treeList[i].disabled = treeList[i].status === 0 ? true : false;
+      treeList[i].disabled = true;
       formatHigherDeptOptions(treeList[i].children);
       newTreeList.push(treeList[i]);
     }

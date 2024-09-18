@@ -151,12 +151,6 @@ defineExpose({ getRef });
             margin-bottom: 20px;
           "
         >
-          <el-input placeholder="请输入菜单进行搜索" class="mb-1" clearable />
-          <div class="flex flex-wrap">
-            <el-checkbox label="展开/折叠" />
-            <el-checkbox label="全选/全不选" />
-            <el-checkbox label="父子联动" />
-          </div>
           <el-tree-v2
             ref="treeRef"
             class="custom-tree"
@@ -166,7 +160,8 @@ defineExpose({ getRef });
             :props="{
               value: 'id',
               label: 'name',
-              children: 'children'
+              children: 'children',
+              disabled: 'disabled'
             }"
           >
             <template #default="{ node }">
