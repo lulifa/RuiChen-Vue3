@@ -1,5 +1,4 @@
 import "./reset.css";
-import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import { handleTree } from "@/utils/tree";
@@ -39,7 +38,8 @@ import {
   update,
   getListAdvanced,
   getOrganizationUnits,
-  setOrganizationUnits
+  setOrganizationUnits,
+  changePassword
 } from "@/api/identity/identity-user";
 import type { GetUserPagedRequestAdvanced } from "@/api/identity/identity-user/model";
 import { getAll as getAllOrganizationUnits } from "@/api/identity/identity-organizationunit";
@@ -80,24 +80,56 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "姓氏",
       prop: "surname",
-      minWidth: 150
+      minWidth: 130
     },
     {
       label: "名称",
       prop: "name",
-      minWidth: 150
+      minWidth: 130
     },
     {
       label: "电子邮箱",
       prop: "email",
-      width: 150
+      width: 130
     },
     {
-      label: "手机号码",
-      prop: "phoneNumber",
+      label: "电子邮箱已确认",
+      prop: "lockoutEnabled",
       width: 150,
+      cellRenderer: scope => (
+        <div class="flex justify-center w-full">
+          <iconifyIconOffline
+            icon={scope.row.emailConfirmed ? Check : Close}
+            style={{
+              color: scope.row.emailConfirmed ? "#13ce66" : "#ff4949",
+              fontSize: "20px"
+            }}
+          />
+        </div>
+      )
+    },
+    {
+      label: "电话号码",
+      prop: "phoneNumber",
+      width: 130,
       formatter: ({ phoneNumber }) =>
         hideTextAtIndex(phoneNumber, { start: 3, end: 6 })
+    },
+    {
+      label: "电话号码已确认",
+      prop: "lockoutEnabled",
+      width: 150,
+      cellRenderer: scope => (
+        <div class="flex justify-center w-full">
+          <iconifyIconOffline
+            icon={scope.row.phoneNumberConfirmed ? Check : Close}
+            style={{
+              color: scope.row.phoneNumberConfirmed ? "#13ce66" : "#ff4949",
+              fontSize: "20px"
+            }}
+          />
+        </div>
+      )
     },
     {
       label: "启用",
@@ -118,7 +150,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "账户锁定",
       prop: "lockoutEnabled",
-      width: 90,
+      width: 100,
       cellRenderer: scope => (
         <div class="flex justify-center w-full">
           <iconifyIconOffline
@@ -130,29 +162,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           />
         </div>
       )
-    },
-    {
-      label: "电子邮件已确认",
-      prop: "lockoutEnabled",
-      width: 150,
-      cellRenderer: scope => (
-        <div class="flex justify-center w-full">
-          <iconifyIconOffline
-            icon={scope.row.emailConfirmed ? Check : Close}
-            style={{
-              color: scope.row.emailConfirmed ? "#13ce66" : "#ff4949",
-              fontSize: "20px"
-            }}
-          />
-        </div>
-      )
-    },
-    {
-      label: "创建时间",
-      minWidth: 90,
-      prop: "createTime",
-      formatter: ({ createTime }) =>
-        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
     },
     {
       label: "操作",
@@ -459,7 +468,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       ),
       closeCallBack: () => (pwdForm.newPwd = ""),
       beforeSure: done => {
-        ruleFormRef.value.validate(valid => {
+        ruleFormRef.value.validate(async valid => {
           if (valid) {
             // 表单规则校验通过
             message(`已成功重置 ${row.userName} 用户的密码`, {
@@ -467,6 +476,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
             });
             console.log(pwdForm.newPwd);
             // 根据实际业务使用pwdForm.newPwd和row里的某些字段去调用重置用户密码接口即可
+            await changePassword(row.id, { password: pwdForm.newPwd });
             done(); // 关闭弹框
             onSearch(); // 刷新表格数据
           }

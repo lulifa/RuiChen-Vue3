@@ -90,11 +90,11 @@ defineExpose({ getRef });
         </el-form-item>
       </re-col>
       <re-col v-show="newFormInline.menuType === 0">
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item label="电子邮箱" prop="email">
           <el-input
             v-model="newFormInline.email"
             clearable
-            placeholder="请输入邮箱"
+            placeholder="请输入电子邮箱"
           />
         </el-form-item>
       </re-col>
