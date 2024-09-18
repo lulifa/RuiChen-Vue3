@@ -96,7 +96,6 @@ export function useDept() {
 
   async function openDialog(title = "新增", row?: FormItemProps) {
     let props = await propsFormInline(title, row);
-    console.log(props);
     addDialog({
       title: `${title}部门`,
       props: props,
@@ -141,7 +140,7 @@ export function useDept() {
     let props: FormProps = {
       formInline: {
         id: null,
-        parentId: null,
+        parentId: row?.parentId,
         displayName: "",
         code: "",
         higherDeptOptions: formatHigherDeptOptions(cloneDeep(dataList.value))
