@@ -152,16 +152,15 @@ defineExpose({ getRef });
           "
         >
           <el-tree-v2
-            ref="treeRef"
+            ref="formtreeRef"
             class="custom-tree"
             show-checkbox
             :data="newFormInline.higherDeptOptions"
-            :default-checked-keys="newFormInline.organizationunitKeys"
+            :default-checked-keys="newFormInline.organizationUnitIds"
             :props="{
               value: 'id',
               label: 'name',
-              children: 'children',
-              disabled: 'disabled'
+              children: 'children'
             }"
           >
             <template #default="{ node }">

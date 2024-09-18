@@ -82,3 +82,22 @@ export interface GetUserPagedRequest extends PagedAndSortedResultRequestDto {
 export interface UserClaim extends IdentityClaim {
   id: string;
 }
+
+export interface GetUserPagedRequestAdvanced extends GetUserPagedRequest {
+  includeDetails?: boolean;
+  roleId?: string;
+  organizationUnitId?: string;
+  userName?: string;
+  phoneNumber?: string;
+  emailAddress?: string;
+  name?: string;
+  surName?: string;
+  isLockedOut?: boolean;
+  notActive?: boolean;
+  emailConfirmed?: boolean;
+  isExternal?: boolean;
+  maxCreationTime?: Date;
+  minCreationTime?: Date;
+  maxModifitionTime?: Date;
+  minModificationTime?: Date;
+}

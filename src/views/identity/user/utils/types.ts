@@ -4,7 +4,7 @@ interface FormItemProps extends User {
   password: string;
   menuType: number;
   roleOptions: Array<any>;
-  organizationunitKeys: Array<any>;
+  organizationUnitIds: Array<any>;
   higherDeptOptions: Array<any>;
 }
 interface FormProps {

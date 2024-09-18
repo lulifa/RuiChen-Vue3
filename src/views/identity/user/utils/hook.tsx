@@ -34,27 +34,18 @@ import {
   create,
   deleteById,
   update,
-  getList,
-  getOrganizationUnits
+  getListAdvanced,
+  getOrganizationUnits,
+  setOrganizationUnits
 } from "@/api/identity/identity-user";
-import type { GetUserPagedRequest } from "@/api/identity/identity-user/model";
+import type { GetUserPagedRequestAdvanced } from "@/api/identity/identity-user/model";
 import { getAll as getAllOrganizationUnits } from "@/api/identity/identity-organizationunit";
 
 export function useUser(tableRef: Ref, treeRef: Ref) {
-  interface CustomForm extends GetUserPagedRequest {
+  interface CustomForm extends Partial<GetUserPagedRequestAdvanced> {
     // 添加自定义字段
-    organizationUnitId: string;
-    userName: string;
-    phoneNumber: string;
-    isActive: boolean;
   }
-  const form = reactive<CustomForm>({
-    // 左侧部门树的id
-    organizationUnitId: null,
-    userName: "",
-    phoneNumber: "",
-    isActive: null
-  });
+  const form = reactive<CustomForm>({});
   const formRef = ref();
   const ruleFormRef = ref();
   const dataList = ref([]);
@@ -221,7 +212,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   async function onSearch() {
     loading.value = true;
     try {
-      const data = await getList(toRaw(form));
+      const data = await getListAdvanced(toRaw(form));
       dataList.value = data.items;
       pagination.total = data.totalCount;
     } finally {
@@ -247,7 +238,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     if (!treeList || !treeList.length) return;
     const newTreeList = [];
     for (let i = 0; i < treeList.length; i++) {
-      treeList[i].disabled = true;
       formatHigherDeptOptions(treeList[i].children);
       newTreeList.push(treeList[i]);
     }
@@ -268,6 +258,8 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
+        const orgData = formRef.value.$refs.formtreeRef; // 获取树形组件的 ref
+        curData.organizationUnitIds = orgData.getCheckedKeys();
         function chores() {
           message(`您${title}了用户名称为${curData.userName}的这条数据`, {
             type: "success"
@@ -282,10 +274,16 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
               await create(curData);
+              await setOrganizationUnits(curData.id, {
+                organizationUnitIds: curData.organizationUnitIds
+              });
               chores();
             } else {
               // 实际开发先调用修改接口，再进行下面操作
               await update(curData.id, curData);
+              await setOrganizationUnits(curData.id, {
+                organizationUnitIds: curData.organizationUnitIds
+              });
               chores();
             }
           }
@@ -312,7 +310,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         twoFactorEnabled: true,
         isActive: true,
         roleOptions: [],
-        organizationunitKeys: [],
+        organizationUnitIds: [],
         higherDeptOptions: formatHigherDeptOptions(higherDeptOptions.value)
       }
     };
@@ -342,7 +340,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       // 获取机构信息TODO
       const userOrganizationUnits = await getOrganizationUnits(row?.id);
       if (userOrganizationUnits) {
-        props.formInline.organizationunitKeys = getKeyList(
+        props.formInline.organizationUnitIds = getKeyList(
           userOrganizationUnits.items,
           "id"
         );
@@ -458,7 +456,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   onMounted(async () => {
     treeLoading.value = true;
     onSearch();
-
+    debugger;
     // 归属部门
     const data = await getAllOrganizationUnits();
     const organizationunits = data.items;

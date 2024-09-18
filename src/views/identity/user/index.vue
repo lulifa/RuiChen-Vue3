@@ -67,7 +67,7 @@ const {
         :model="form"
         class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
       >
-        <el-form-item label="高级搜索：" style="width: 96%">
+        <el-form-item label="高级搜索：" style="width: 94%">
           <el-input
             v-model="form.filter"
             placeholder="请输入搜索内容，常见的用户字段都可以用高级搜索进行查询，比如用户名称、姓氏、名称、电子邮箱、电话号码等字段"
@@ -90,15 +90,15 @@ const {
             class="!w-[180px]"
           />
         </el-form-item>
-        <el-form-item label="状态：" prop="isActive">
+        <el-form-item label="用户不可用：" prop="notActive">
           <el-select
-            v-model="form.isActive"
+            v-model="form.notActive"
             placeholder="请选择"
             clearable
             class="!w-[180px]"
           >
-            <el-option label="已启用" value="true" />
-            <el-option label="已禁用" value="false" />
+            <el-option label="是" value="true" />
+            <el-option label="否" value="false" />
           </el-select>
         </el-form-item>
         <el-form-item>

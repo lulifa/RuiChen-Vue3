@@ -8,7 +8,8 @@ import type {
   UpdateUser,
   GetUserPagedRequest,
   UserClaim,
-  IdentityUserOrganizationUnitUpdateDto
+  IdentityUserOrganizationUnitUpdateDto,
+  GetUserPagedRequestAdvanced
 } from "./model";
 
 import type {
@@ -70,6 +71,15 @@ export const getList = (input: GetUserPagedRequest) => {
   });
 };
 
+export const getListAdvanced = (input: GetUserPagedRequestAdvanced) => {
+  return http.get<PagedResultDto<User>>(
+    baseUrlApi("identity/users/advanced-users"),
+    {
+      params: input
+    }
+  );
+};
+
 export const update = (id: string, input: UpdateUser) => {
   return http.put<User>(baseUrlApi(`identity/users/${id}`), {
     data: input
@@ -101,13 +111,13 @@ export const setOrganizationUnits = (
   input: IdentityUserOrganizationUnitUpdateDto
 ) => {
   return http.put<ListResultDto<OrganizationUnit>>(
-    baseUrlApi(`/api/identity/users/${id}/organization-units`),
+    baseUrlApi(`identity/users/${id}/organization-units`),
     { data: input }
   );
 };
 
 export const removeOrganizationUnit = (id: string, ouId: string) => {
   return http.delete(
-    baseUrlApi(`/api/identity/users/${id}/organization-units/${ouId}`)
+    baseUrlApi(`identity/users/${id}/organization-units/${ouId}`)
   );
 };
