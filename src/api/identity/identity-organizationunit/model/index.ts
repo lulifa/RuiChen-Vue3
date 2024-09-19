@@ -15,6 +15,11 @@ export interface GetOrganizationUnitPagedRequest
   filter?: string;
 }
 
+export interface GetOrganizationUnitsAdvancedInput {
+  /** 过滤字符 */
+  filter?: string;
+}
+
 /** 组织机构创建对象 */
 export interface CreateOrganizationUnit {
   /** 显示名称 */

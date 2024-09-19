@@ -488,7 +488,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   onMounted(async () => {
     treeLoading.value = true;
     onSearch();
-    debugger;
+
     // 归属部门
     const data = await getAllOrganizationUnits();
     const organizationunits = data.items;

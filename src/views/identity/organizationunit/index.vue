@@ -36,14 +36,14 @@ const {
       :model="form"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
     >
-      <!-- <el-form-item label="部门名称：" prop="name">
+      <el-form-item label="高级搜索：" prop="filter">
         <el-input
-          v-model="form.displayName"
-          placeholder="请输入部门名称"
+          v-model="form.filter"
+          placeholder="请输入搜索内容"
           clearable
           class="!w-[180px]"
         />
-      </el-form-item> -->
+      </el-form-item>
       <el-form-item>
         <el-button
           type="primary"
@@ -60,7 +60,7 @@ const {
     </el-form>
 
     <PureTableBar
-      title="部门管理（仅演示，操作后不生效）"
+      title=""
       :columns="columns"
       :tableRef="tableRef?.getTableRef()"
       @refresh="onSearch"

@@ -215,18 +215,6 @@ const {
                         link
                         type="primary"
                         :size="size"
-                        :icon="useRenderIcon(Upload)"
-                        @click="handleUpload(row)"
-                      >
-                        上传头像
-                      </el-button>
-                    </el-dropdown-item>
-                    <el-dropdown-item>
-                      <el-button
-                        :class="buttonClass"
-                        link
-                        type="primary"
-                        :size="size"
                         :icon="useRenderIcon(Password)"
                         @click="handleReset(row)"
                       >

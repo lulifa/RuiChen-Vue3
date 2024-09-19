@@ -4,7 +4,8 @@ import type {
   OrganizationUnit,
   CreateOrganizationUnit,
   UpdateOrganizationUnit,
-  GetOrganizationUnitPagedRequest
+  GetOrganizationUnitPagedRequest,
+  GetOrganizationUnitsAdvancedInput
 } from "./model";
 import type { GetUserPagedRequest, User } from "../identity-user/model";
 import type { GetRolePagedRequest, Role } from "../identity-role/model";
@@ -90,9 +91,12 @@ export const getRoleList = (id: string, input: GetRolePagedRequest) => {
   );
 };
 
-export const getAll = () => {
+export const getAll = (input: GetOrganizationUnitsAdvancedInput = null) => {
   return http.get<ListResultDto<OrganizationUnit>>(
-    baseUrlApi("identity/organization-units/all")
+    baseUrlApi("identity/organization-units/all"),
+    {
+      params: input
+    }
   );
 };
 

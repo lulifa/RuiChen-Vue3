@@ -3,25 +3,26 @@ import editForm from "../form.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
-import { reactive, ref, onMounted, h } from "vue";
+import { reactive, ref, onMounted, h, toRaw } from "vue";
 import type { FormProps, FormItemProps } from "../utils/types";
-import { cloneDeep, deviceDetection, isAllEmpty } from "@pureadmin/utils";
+import { cloneDeep, deviceDetection } from "@pureadmin/utils";
 
 import {
   getAll,
   get,
   create,
-  update
+  update,
+  deleteById
 } from "@/api/identity/identity-organizationunit";
 import type { GetOrganizationUnitPagedRequest } from "@/api/identity/identity-organizationunit/model";
 
 export function useDept() {
   interface CustomForm extends GetOrganizationUnitPagedRequest {
     // 添加自定义字段
-    displayName: string;
+    filter: string;
   }
   const form = reactive<CustomForm>({
-    displayName: null
+    filter: null
   });
 
   const formRef = ref();
@@ -68,14 +69,8 @@ export function useDept() {
   async function onSearch() {
     loading.value = true;
     try {
-      const data = await getAll(); // 这里是返回一维数组结构，前端自行处理成树结构，返回格式要求：唯一id加父节点parentId，parentId取父节点id
+      const data = await getAll(toRaw(form)); // 这里是返回一维数组结构，前端自行处理成树结构，返回格式要求：唯一id加父节点parentId，parentId取父节点id
       let newData = data.items;
-      if (!isAllEmpty(form.displayName)) {
-        // 前端搜索部门名称
-        newData = newData.filter(item =>
-          item.displayName.includes(form.displayName)
-        );
-      }
       dataList.value = handleTree(newData, "displayName"); // 处理成树结构
     } finally {
       loading.value = false;
@@ -158,7 +153,8 @@ export function useDept() {
     return props;
   }
 
-  function handleDelete(row) {
+  async function handleDelete(row) {
+    await deleteById(row?.id);
     message(`您删除了部门名称为${row.name}的这条数据`, { type: "success" });
     onSearch();
   }
