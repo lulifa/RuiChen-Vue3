@@ -7,6 +7,17 @@ export default {
   },
   children: [
     {
+      path: "/system/role/index",
+      name: "SystemRole",
+      component: () => import("@/views/identity/role/index.vue"),
+      meta: {
+        icon: "ri:admin-line",
+        title: "角色管理",
+        showParent: true,
+        roles: ["admin"]
+      }
+    },
+    {
       path: "/system/user/index",
       name: "SystemUser",
       component: () => import("@/views/identity/user/index.vue"),
@@ -24,6 +35,18 @@ export default {
       meta: {
         icon: "ri:git-branch-line",
         title: "部门管理",
+        showParent: true,
+        roles: ["admin"]
+      }
+    },
+    {
+      path: "/system/organizationunit/page/user/index",
+      name: "SystemOrganizationUnitUser",
+      component: () =>
+        import("@/views/identity/organizationunit/page/user/index.vue"),
+      meta: {
+        icon: "ri:git-branch-line",
+        title: "部门用户",
         showParent: true,
         roles: ["admin"]
       }
