@@ -40,7 +40,6 @@ const {
   onTreeSelect,
   handleUpdate,
   handleDelete,
-  handleUpload,
   handleReset,
   handleSizeChange,
   onSelectionCancel,

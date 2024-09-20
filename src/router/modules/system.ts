@@ -40,13 +40,25 @@ export default {
       }
     },
     {
-      path: "/system/organizationunit/page/user/index",
+      path: "/system/organizationunit/pages/user/index",
       name: "SystemOrganizationUnitUser",
       component: () =>
-        import("@/views/identity/organizationunit/page/user/index.vue"),
+        import("@/views/identity/organizationunit/pages/user/index.vue"),
       meta: {
         icon: "ri:git-branch-line",
         title: "部门用户",
+        showParent: true,
+        roles: ["admin"]
+      }
+    },
+    {
+      path: "/system/organizationunit/pages/role/index",
+      name: "SystemOrganizationUnitRole",
+      component: () =>
+        import("@/views/identity/organizationunit/pages/role/index.vue"),
+      meta: {
+        icon: "ri:git-branch-line",
+        title: "部门角色",
         showParent: true,
         roles: ["admin"]
       }

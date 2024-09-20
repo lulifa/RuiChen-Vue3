@@ -100,7 +100,6 @@ export function useDept() {
       closeOnClickModal: false,
       contentRenderer: () => h(editForm, { ref: formRef }),
       beforeSure: (done, { options }) => {
-        debugger;
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
         function chores() {
