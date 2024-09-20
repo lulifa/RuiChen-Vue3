@@ -5,7 +5,6 @@ import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
 import Check from "@iconify-icons/ep/check";
 import Close from "@iconify-icons/ep/close";
-
 import { hideTextAtIndex, deviceDetection } from "@pureadmin/utils";
 import { type Ref, h, ref, toRaw, reactive, onMounted } from "vue";
 
@@ -48,54 +47,36 @@ export function useUserOrg(tableRef: Ref, treeRef: Ref) {
     {
       label: "姓氏",
       prop: "surname",
-      minWidth: 130
+      minWidth: 90
     },
     {
       label: "名称",
       prop: "name",
-      minWidth: 130
+      minWidth: 90
     },
     {
       label: "电子邮箱",
       prop: "email",
-      width: 130
-    },
-    {
-      label: "电子邮箱已确认",
-      prop: "lockoutEnabled",
-      width: 150,
-      cellRenderer: scope => (
-        <div class="flex justify-center w-full">
-          <iconifyIconOffline
-            icon={scope.row.emailConfirmed ? Check : Close}
-            style={{
-              color: scope.row.emailConfirmed ? "#13ce66" : "#ff4949",
-              fontSize: "20px"
-            }}
-          />
+      minWidth: 180,
+      cellRenderer: ({ row, props }) => (
+        <div style="white-space: nowrap;">
+          <span>{row.email}</span>
+          <el-tag size={props.size} style="margin-left:20px;">
+            {row.emailConfirmed ? "已确认" : "未确认"}
+          </el-tag>
         </div>
       )
     },
     {
       label: "电话号码",
       prop: "phoneNumber",
-      width: 130,
-      formatter: ({ phoneNumber }) =>
-        hideTextAtIndex(phoneNumber, { start: 3, end: 6 })
-    },
-    {
-      label: "电话号码已确认",
-      prop: "lockoutEnabled",
-      width: 150,
-      cellRenderer: scope => (
-        <div class="flex justify-center w-full">
-          <iconifyIconOffline
-            icon={scope.row.phoneNumberConfirmed ? Check : Close}
-            style={{
-              color: scope.row.phoneNumberConfirmed ? "#13ce66" : "#ff4949",
-              fontSize: "20px"
-            }}
-          />
+      minWidth: 180,
+      cellRenderer: ({ row, props }) => (
+        <div style="white-space: nowrap;">
+          <span>{hideTextAtIndex(row.phoneNumber, { start: 3, end: 6 })}</span>
+          <el-tag size={props.size} style="margin-left:20px;">
+            {row.phoneNumberConfirmed ? "已确认" : "未确认"}
+          </el-tag>
         </div>
       )
     },
