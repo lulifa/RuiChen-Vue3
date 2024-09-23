@@ -3,7 +3,7 @@ import editForm from "../form.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
-import { reactive, ref, onMounted, h, toRaw } from "vue";
+import { reactive, ref, onMounted, h, toRaw, computed } from "vue";
 import type { FormProps, FormItemProps } from "../utils/types";
 import { cloneDeep, deviceDetection } from "@pureadmin/utils";
 
@@ -51,10 +51,20 @@ export function useDept() {
     {
       label: "操作",
       fixed: "right",
-      width: 210,
+      width: 240,
       slot: "operation"
     }
   ];
+
+  const buttonClass = computed(() => {
+    return [
+      "!h-[20px]",
+      "reset-margin",
+      "!text-gray-500",
+      "dark:!text-white",
+      "dark:hover:!text-primary"
+    ];
+  });
 
   function handleSelectionChange(val) {
     console.log("handleSelectionChange", val);
@@ -166,6 +176,7 @@ export function useDept() {
     loading,
     columns,
     dataList,
+    buttonClass,
     /** 搜索 */
     onSearch,
     /** 重置 */

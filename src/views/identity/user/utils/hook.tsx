@@ -84,26 +84,38 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "电子邮箱",
       prop: "email",
-      minWidth: 180,
+      headerAlign: "center",
+      align: "left",
+      width: 240,
       cellRenderer: ({ row, props }) => (
         <div style="white-space: nowrap;">
-          <span>{row.email}</span>
-          <el-tag size={props.size} style="margin-left:20px;">
+          <el-tag
+            size={props.size}
+            type={row.emailConfirmed ? "success" : null}
+          >
             {row.emailConfirmed ? "已确认" : "未确认"}
           </el-tag>
+          <span style="margin-left:20px;">{row.email}</span>
         </div>
       )
     },
     {
       label: "电话号码",
       prop: "phoneNumber",
-      minWidth: 180,
+      headerAlign: "center",
+      align: "left",
+      width: 240,
       cellRenderer: ({ row, props }) => (
         <div style="white-space: nowrap;">
-          <span>{hideTextAtIndex(row.phoneNumber, { start: 3, end: 6 })}</span>
-          <el-tag size={props.size} style="margin-left:20px;">
+          <el-tag
+            size={props.size}
+            type={row.phoneNumberConfirmed ? "success" : null}
+          >
             {row.phoneNumberConfirmed ? "已确认" : "未确认"}
           </el-tag>
+          <span style="margin-left:20px;">
+            {hideTextAtIndex(row.phoneNumber, { start: 3, end: 6 })}
+          </span>
         </div>
       )
     },

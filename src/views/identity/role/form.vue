@@ -4,11 +4,7 @@ import { formRules } from "./utils/rule";
 import { FormProps } from "./utils/types";
 
 const props = withDefaults(defineProps<FormProps>(), {
-  formInline: () => ({
-    name: "",
-    code: "",
-    remark: ""
-  })
+  formInline: () => ({})
 });
 
 const ruleFormRef = ref();
@@ -28,28 +24,18 @@ defineExpose({ getRef });
     :rules="formRules"
     label-width="82px"
   >
-    <el-form-item label="角色名称" prop="name">
+    <el-form-item label="名称" prop="name">
       <el-input
         v-model="newFormInline.name"
         clearable
-        placeholder="请输入角色名称"
+        :disabled="newFormInline.isStatic"
+        placeholder="请输入名称"
       />
     </el-form-item>
 
-    <el-form-item label="角色标识" prop="code">
-      <el-input
-        v-model="newFormInline.code"
-        clearable
-        placeholder="请输入角色标识"
-      />
-    </el-form-item>
-
-    <el-form-item label="备注">
-      <el-input
-        v-model="newFormInline.remark"
-        placeholder="请输入备注信息"
-        type="textarea"
-      />
+    <el-form-item label="类型">
+      <el-checkbox v-model="newFormInline.isDefault" label="默认" border />
+      <el-checkbox v-model="newFormInline.isPublic" label="公开" border />
     </el-form-item>
   </el-form>
 </template>

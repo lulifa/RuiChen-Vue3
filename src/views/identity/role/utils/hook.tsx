@@ -1,21 +1,36 @@
-import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
 import { transformI18n } from "@/plugins/i18n";
 import { addDialog } from "@/components/ReDialog";
-import type { FormItemProps } from "../utils/types";
 import type { PaginationProps } from "@pureadmin/table";
 import { getKeyList, deviceDetection } from "@pureadmin/utils";
-import { getRoleList, getRoleMenu, getRoleMenuIds } from "@/api/system";
-import { type Ref, reactive, ref, onMounted, h, toRaw, watch } from "vue";
+import { getRoleMenu, getRoleMenuIds } from "@/api/system";
+import {
+  type Ref,
+  reactive,
+  ref,
+  onMounted,
+  h,
+  toRaw,
+  watch,
+  computed
+} from "vue";
+import type { FormProps, FormItemProps } from "../utils/types";
+import {
+  create,
+  update,
+  deleteById,
+  getById,
+  getList
+} from "@/api/identity/identity-role";
+import type { GetRolePagedRequest } from "@/api/identity/identity-role/model";
 
 export function useRole(treeRef: Ref) {
-  const form = reactive({
-    name: "",
-    code: "",
-    status: ""
-  });
+  interface CustomForm extends Partial<GetRolePagedRequest> {
+    // 添加自定义字段
+  }
+  const form = reactive<CustomForm>({});
   const curRow = ref();
   const formRef = ref();
   const dataList = ref([]);
@@ -40,28 +55,34 @@ export function useRole(treeRef: Ref) {
   });
   const columns: TableColumnList = [
     {
-      label: "角色编号",
-      prop: "id"
-    },
-    {
       label: "角色名称",
-      prop: "name"
-    },
-    {
-      label: "角色标识",
-      prop: "code"
-    },
-    {
-      label: "备注",
-      prop: "remark",
-      minWidth: 160
-    },
-    {
-      label: "创建时间",
-      prop: "createTime",
-      minWidth: 160,
-      formatter: ({ createTime }) =>
-        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+      prop: "name",
+      headerAlign: "center",
+      align: "left",
+      cellRenderer: ({ row, props }) => {
+        const tags = [
+          { condition: row.isDefault, label: "默认", type: null },
+          { condition: row.isPublic, label: "公开", type: null },
+          { condition: row.isStatic, label: "内置", type: "danger" }
+        ];
+        return (
+          <div style="white-space: nowrap;">
+            {tags.map((tag, index) =>
+              tag.condition ? (
+                <el-tag
+                  key={index}
+                  size={props.size}
+                  type={tag.type}
+                  style="margin-right: 20px;"
+                >
+                  {tag.label}
+                </el-tag>
+              ) : null
+            )}
+            <span>{row.name}</span>
+          </div>
+        );
+      }
     },
     {
       label: "操作",
@@ -70,27 +91,31 @@ export function useRole(treeRef: Ref) {
       slot: "operation"
     }
   ];
-  // const buttonClass = computed(() => {
-  //   return [
-  //     "!h-[20px]",
-  //     "reset-margin",
-  //     "!text-gray-500",
-  //     "dark:!text-white",
-  //     "dark:hover:!text-primary"
-  //   ];
-  // });
 
-  function handleDelete(row) {
+  const buttonClass = computed(() => {
+    return [
+      "!h-[20px]",
+      "reset-margin",
+      "!text-gray-500",
+      "dark:!text-white",
+      "dark:hover:!text-primary"
+    ];
+  });
+
+  async function handleDelete(row) {
+    await deleteById(row?.id);
     message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
     onSearch();
   }
 
   function handleSizeChange(val: number) {
-    console.log(`${val} items per page`);
+    form.maxResultCount = val;
+    onSearch();
   }
 
   function handleCurrentChange(val: number) {
-    console.log(`current page: ${val}`);
+    form.skipCount = (val - 1) * pagination.pageSize;
+    onSearch();
   }
 
   function handleSelectionChange(val) {
@@ -99,15 +124,13 @@ export function useRole(treeRef: Ref) {
 
   async function onSearch() {
     loading.value = true;
-    const { data } = await getRoleList(toRaw(form));
-    dataList.value = data.list;
-    pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
-
-    setTimeout(() => {
+    try {
+      const data = await getList(toRaw(form));
+      dataList.value = data.items;
+      pagination.total = data.totalCount;
+    } finally {
       loading.value = false;
-    }, 500);
+    }
   }
 
   const resetForm = formEl => {
@@ -116,16 +139,11 @@ export function useRole(treeRef: Ref) {
     onSearch();
   };
 
-  function openDialog(title = "新增", row?: FormItemProps) {
+  async function openDialog(title = "新增", row?: FormItemProps) {
+    let props = await propsFormInline(title, row);
     addDialog({
       title: `${title}角色`,
-      props: {
-        formInline: {
-          name: row?.name ?? "",
-          code: row?.code ?? "",
-          remark: row?.remark ?? ""
-        }
-      },
+      props: props,
       width: "40%",
       draggable: true,
       fullscreen: deviceDetection(),
@@ -142,15 +160,17 @@ export function useRole(treeRef: Ref) {
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
         }
-        FormRef.validate(valid => {
+        FormRef.validate(async valid => {
           if (valid) {
             console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
+              await create(curData);
               chores();
             } else {
               // 实际开发先调用修改接口，再进行下面操作
+              await update(curData.id, curData);
               chores();
             }
           }
@@ -159,8 +179,32 @@ export function useRole(treeRef: Ref) {
     });
   }
 
+  async function propsFormInline(title, row?: FormItemProps) {
+    let props: FormProps = {
+      formInline: {
+        id: null,
+        name: "",
+        isDefault: false,
+        isPublic: false,
+        isStatic: false
+      }
+    };
+    if (title !== "新增") {
+      const role = await getById(row?.id);
+      if (role) {
+        props.formInline.id = role.id;
+        props.formInline.name = role.name;
+        props.formInline.isDefault = role.isDefault;
+        props.formInline.isPublic = role.isPublic;
+        props.formInline.isStatic = role.isStatic;
+      }
+    }
+    return props;
+  }
+
   /** 菜单权限 */
   async function handleMenu(row?: any) {
+    debugger;
     const { id } = row;
     if (id) {
       curRow.value = row;
@@ -236,7 +280,7 @@ export function useRole(treeRef: Ref) {
     isExpandAll,
     isSelectAll,
     treeSearchValue,
-    // buttonClass,
+    buttonClass,
     onSearch,
     resetForm,
     openDialog,
