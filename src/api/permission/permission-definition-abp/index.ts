@@ -9,7 +9,7 @@ import type {
 
 export const get = (provider: PermissionProvider) => {
   return http.get<PermissionResult>(
-    baseUrlApi("/api/permission-management/permissions"),
+    baseUrlApi("permission-management/permissions"),
     { params: provider }
   );
 };
@@ -18,7 +18,7 @@ export const update = (
   provider: PermissionProvider,
   input: UpdatePermissions
 ) => {
-  return http.put(baseUrlApi("/api/permission-management/permissions"), {
+  return http.put(baseUrlApi("permission-management/permissions"), {
     data: input,
     params: provider
   });

@@ -4,8 +4,7 @@ import { message } from "@/utils/message";
 import { transformI18n } from "@/plugins/i18n";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
-import { getKeyList, deviceDetection } from "@pureadmin/utils";
-import { getRoleMenu, getRoleMenuIds } from "@/api/system";
+import { deviceDetection } from "@pureadmin/utils";
 import {
   type Ref,
   reactive,
@@ -25,6 +24,12 @@ import {
   getList
 } from "@/api/identity/identity-role";
 import type { GetRolePagedRequest } from "@/api/identity/identity-role/model";
+import { get as getAbpPermissions } from "@/api/permission/permission-definition-abp";
+import type {
+  PermissionGroup,
+  PermissionProvider,
+  PermissionTree
+} from "@/api/permission/permission-definition-abp/model";
 
 export function useRole(treeRef: Ref) {
   interface CustomForm extends Partial<GetRolePagedRequest> {
@@ -46,6 +51,10 @@ export function useRole(treeRef: Ref) {
     value: "id",
     label: "title",
     children: "children"
+  };
+  const permissionQuery: PermissionProvider = {
+    providerKey: "",
+    providerName: "R"
   };
   const pagination = reactive<PaginationProps>({
     total: 0,
@@ -202,19 +211,35 @@ export function useRole(treeRef: Ref) {
     return props;
   }
 
-  /** 菜单权限 */
-  async function handleMenu(row?: any) {
-    debugger;
+  /** 权限 */
+  async function handlePermission(row?: any) {
     const { id } = row;
     if (id) {
       curRow.value = row;
       isShow.value = true;
-      const { data } = await getRoleMenuIds({ id });
+      permissionQuery.providerKey = row?.name;
+      const data = await getAbpPermissions(permissionQuery);
       treeRef.value.setCheckedKeys(data);
     } else {
       curRow.value = null;
       isShow.value = false;
     }
+  }
+
+  function generatePermissionTree(permissionGroups: PermissionGroup[]) {
+    const trees: PermissionTree[] = [];
+    permissionGroups.forEach(g => {
+      const tree: PermissionTree = {
+        isRoot: true,
+        name: g.name,
+        displayName: g.displayName,
+        disabled: false,
+        children: [],
+        parentName: g.name
+      };
+      tree.children = handleTree(g.permissions, "");
+    });
+    return trees;
   }
 
   /** 高亮当前权限选中行 */
@@ -235,6 +260,24 @@ export function useRole(treeRef: Ref) {
     });
   }
 
+  function traverseTree(node, arr) {
+    const newcheckedKeys = treeRef.value.getCheckedKeys();
+    const isChecked = newcheckedKeys.includes(node.id);
+
+    // 处理当前节点
+    if (node.isGranted !== isChecked) {
+      arr.push({
+        isGranted: !node.isGranted,
+        name: node.id
+      });
+    }
+
+    // 处理子节点
+    if (node.children) {
+      node.children.forEach(child => traverseTree(child, arr));
+    }
+  }
+
   /** 数据权限 可自行开发 */
   // function handleDatabase() {}
 
@@ -248,9 +291,9 @@ export function useRole(treeRef: Ref) {
 
   onMounted(async () => {
     onSearch();
-    const { data } = await getRoleMenu();
-    treeIds.value = getKeyList(data, "id");
-    treeData.value = handleTree(data);
+    // const { data } = await getRoleMenu();
+    // treeIds.value = getKeyList(data, "id");
+    // treeData.value = handleTree(data);
   });
 
   watch(isExpandAll, val => {
@@ -284,7 +327,7 @@ export function useRole(treeRef: Ref) {
     onSearch,
     resetForm,
     openDialog,
-    handleMenu,
+    handlePermission,
     handleSave,
     handleDelete,
     filterMethod,

@@ -41,7 +41,7 @@ const iconClass = computed(() => {
     "dark:hover:text-[#ffffffd9]"
   ];
 });
-
+const items = ["用户管理", "部门管理", "角色管理"];
 const treeRef = ref();
 const formRef = ref();
 const tableRef = ref();
@@ -67,7 +67,7 @@ const {
   onSearch,
   resetForm,
   openDialog,
-  handleMenu,
+  handlePermission,
   handleSave,
   handleDelete,
   filterMethod,
@@ -207,7 +207,7 @@ onMounted(() => {
                         type="primary"
                         :size="size"
                         :icon="useRenderIcon(Menu)"
-                        @click="handleMenu(row)"
+                        @click="handlePermission(row)"
                       >
                         菜单权限
                       </el-button>
@@ -224,63 +224,78 @@ onMounted(() => {
         v-if="isShow"
         class="!min-w-[calc(100vw-60vw-268px)] w-full mt-2 px-2 pb-2 bg-bg_color ml-2 overflow-auto"
       >
-        <div class="flex justify-between w-full px-3 pt-5 pb-4">
-          <div class="flex">
-            <span :class="iconClass">
-              <IconifyIconOffline
-                v-tippy="{
-                  content: '关闭'
-                }"
-                class="dark:text-white"
-                width="18px"
-                height="18px"
-                :icon="Close"
-                @click="handleMenu"
-              />
-            </span>
-            <span :class="[iconClass, 'ml-2']">
-              <IconifyIconOffline
-                v-tippy="{
-                  content: '保存菜单权限'
-                }"
-                class="dark:text-white"
-                width="18px"
-                height="18px"
-                :icon="Check"
-                @click="handleSave"
-              />
-            </span>
+        <div class="flex">
+          <div class="flex flex-col" style="margin-top: 100px">
+            <!-- 左侧的 tab 列表 -->
+            <el-tabs tab-position="left">
+              <el-tab-pane label="用户管理" />
+              <el-tab-pane label="配置管理" />
+              <el-tab-pane label="角色管理" />
+              <el-tab-pane label="定时任务补偿" />
+            </el-tabs>
           </div>
-          <p class="font-bold truncate">
-            菜单权限
-            {{ `${curRow?.name ? `（${curRow.name}）` : ""}` }}
-          </p>
+
+          <!-- 右侧的树状结构 -->
+          <div class="flex-1 ml-4">
+            <div class="flex justify-between w-full px-3 pt-5 pb-4">
+              <div class="flex">
+                <span :class="iconClass">
+                  <IconifyIconOffline
+                    v-tippy="{
+                      content: '关闭'
+                    }"
+                    class="dark:text-white"
+                    width="18px"
+                    height="18px"
+                    :icon="Close"
+                    @click="handlePermission"
+                  />
+                </span>
+                <span :class="[iconClass, 'ml-2']">
+                  <IconifyIconOffline
+                    v-tippy="{
+                      content: '保存菜单权限'
+                    }"
+                    class="dark:text-white"
+                    width="18px"
+                    height="18px"
+                    :icon="Check"
+                    @click="handleSave"
+                  />
+                </span>
+              </div>
+              <p class="font-bold truncate">
+                菜单权限
+                {{ `${curRow?.name ? `（${curRow.name}）` : ""}` }}
+              </p>
+            </div>
+            <el-input
+              v-model="treeSearchValue"
+              placeholder="请输入菜单进行搜索"
+              class="mb-1"
+              clearable
+              @input="onQueryChanged"
+            />
+            <div class="flex flex-wrap">
+              <el-checkbox v-model="isExpandAll" label="展开/折叠" />
+              <el-checkbox v-model="isSelectAll" label="全选/全不选" />
+              <el-checkbox v-model="isLinkage" label="父子联动" />
+            </div>
+            <el-tree-v2
+              ref="treeRef"
+              show-checkbox
+              :data="treeData"
+              :props="treeProps"
+              :height="treeHeight"
+              :check-strictly="!isLinkage"
+              :filter-method="filterMethod"
+            >
+              <template #default="{ node }">
+                <span>{{ transformI18n(node.label) }}</span>
+              </template>
+            </el-tree-v2>
+          </div>
         </div>
-        <el-input
-          v-model="treeSearchValue"
-          placeholder="请输入菜单进行搜索"
-          class="mb-1"
-          clearable
-          @input="onQueryChanged"
-        />
-        <div class="flex flex-wrap">
-          <el-checkbox v-model="isExpandAll" label="展开/折叠" />
-          <el-checkbox v-model="isSelectAll" label="全选/全不选" />
-          <el-checkbox v-model="isLinkage" label="父子联动" />
-        </div>
-        <el-tree-v2
-          ref="treeRef"
-          show-checkbox
-          :data="treeData"
-          :props="treeProps"
-          :height="treeHeight"
-          :check-strictly="!isLinkage"
-          :filter-method="filterMethod"
-        >
-          <template #default="{ node }">
-            <span>{{ transformI18n(node.label) }}</span>
-          </template>
-        </el-tree-v2>
       </div>
     </div>
   </div>
@@ -307,5 +322,12 @@ onMounted(() => {
   :deep(.el-form-item) {
     margin-bottom: 12px;
   }
+}
+.el-tabs__item.is-active {
+  background-color: lightblue !important;
+}
+
+.el-tabs__item {
+  background-color: lightgray !important;
 }
 </style>
