@@ -40,7 +40,7 @@ export function useRole(treeRef: Ref) {
   const formRef = ref();
   const dataList = ref([]);
   const treeIds = ref([]);
-  const treeData = ref([]);
+  const treeData = ref<PermissionTree[]>([]);
   const isShow = ref(false);
   const loading = ref(true);
   const isLinkage = ref(false);
@@ -49,7 +49,7 @@ export function useRole(treeRef: Ref) {
   const isSelectAll = ref(false);
   const treeProps = {
     value: "id",
-    label: "title",
+    label: "name",
     children: "children"
   };
   const permissionQuery: PermissionProvider = {
@@ -219,25 +219,72 @@ export function useRole(treeRef: Ref) {
       isShow.value = true;
       permissionQuery.providerKey = row?.name;
       const data = await getAbpPermissions(permissionQuery);
-      treeRef.value.setCheckedKeys(data);
+      const nodes = generatePermissionTreeRoot(data.groups);
+      const treenodes = nodes
+        .filter(item => item.isRoot)
+        .flatMap(root => root.children);
+
+      treeData.value = handleTree(treenodes);
+      // treeRef.value.setCheckedKeys(data);
     } else {
       curRow.value = null;
       isShow.value = false;
     }
   }
 
-  function generatePermissionTree(permissionGroups: PermissionGroup[]) {
+  // function generatePermissionTree(permissionGroups: PermissionGroup[]) {
+  //   const trees: PermissionTree[] = [];
+  //   permissionGroups.forEach(g => {
+  //     g.permissions.forEach(p => {
+  //       const tree: PermissionTree = {
+  //         isRoot: false,
+  //         id: p.name,
+  //         parentId: p.parentName,
+  //         name: p.displayName,
+  //         disabled: false,
+  //         children: [],
+  //         isGranted: p.isGranted,
+  //         grantedProviders: p.grantedProviders,
+  //         allowedProviders: p.allowedProviders
+  //       };
+  //       trees.push(tree);
+  //     });
+  //   });
+  //   return trees;
+  // }
+
+  function generatePermissionTreeRoot(permissionGroups: PermissionGroup[]) {
     const trees: PermissionTree[] = [];
     permissionGroups.forEach(g => {
-      const tree: PermissionTree = {
+      const root: PermissionTree = {
         isRoot: true,
-        name: g.name,
-        displayName: g.displayName,
-        disabled: false,
+        id: g.name,
+        parentId: g.name,
+        name: g.displayName,
+        disabled: true,
         children: [],
-        parentName: g.name
+        isGranted: false,
+        grantedProviders: [],
+        allowedProviders: []
       };
-      tree.children = handleTree(g.permissions, "");
+      let rootChildren: PermissionTree[] = [];
+      g.permissions.forEach(p => {
+        const tree: PermissionTree = {
+          isRoot: false,
+          id: p.name,
+          parentId: p.parentName,
+          name: p.displayName,
+          disabled: false,
+          children: [],
+          isGranted: p.isGranted,
+          grantedProviders: p.grantedProviders,
+          allowedProviders: p.allowedProviders
+        };
+        rootChildren.push(tree);
+      });
+      root.children = rootChildren;
+
+      trees.push(root);
     });
     return trees;
   }
@@ -253,6 +300,10 @@ export function useRole(treeRef: Ref) {
   /** 菜单权限-保存 */
   function handleSave() {
     const { id, name } = curRow.value;
+    const arr = [];
+    for (let node of treeData.value) {
+      traverseTree(node.children, arr);
+    }
     // 根据用户 id 调用实际项目中菜单权限修改接口
     console.log(id, treeRef.value.getCheckedKeys());
     message(`角色名称为${name}的菜单权限修改成功`, {
@@ -271,7 +322,6 @@ export function useRole(treeRef: Ref) {
         name: node.id
       });
     }
-
     // 处理子节点
     if (node.children) {
       node.children.forEach(child => traverseTree(child, arr));
@@ -291,9 +341,6 @@ export function useRole(treeRef: Ref) {
 
   onMounted(async () => {
     onSearch();
-    // const { data } = await getRoleMenu();
-    // treeIds.value = getKeyList(data, "id");
-    // treeData.value = handleTree(data);
   });
 
   watch(isExpandAll, val => {

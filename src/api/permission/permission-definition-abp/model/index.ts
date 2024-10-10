@@ -32,9 +32,9 @@ export interface PermissionGroup {
 export interface PermissionTree {
   isRoot: boolean;
   /** 权限标识 */
-  name: string;
+  id: string;
   /** 显示名称 */
-  displayName: string;
+  name: string;
   /** 是否授权 */
   isGranted?: boolean;
   /** 是否禁用 */
@@ -42,7 +42,9 @@ export interface PermissionTree {
   /** 子节点 */
   children: PermissionTree[];
   /** 父节点 */
-  parentName?: string;
+  parentId?: string;
+  allowedProviders: string[];
+  grantedProviders: PermissionProvider[];
 }
 
 export class UpdatePermission implements IPermission {
