@@ -55,7 +55,10 @@ const {
   columns,
   rowStyle,
   dataList,
+  activeTab,
+  treeDataAll,
   treeData,
+  tabClick,
   treeProps,
   isLinkage,
   pagination,
@@ -208,7 +211,7 @@ onMounted(() => {
                         :icon="useRenderIcon(Menu)"
                         @click="handlePermission(row)"
                       >
-                        菜单权限
+                        权限
                       </el-button>
                     </el-dropdown-item>
                   </el-dropdown-menu>
@@ -223,64 +226,85 @@ onMounted(() => {
         v-if="isShow"
         class="!min-w-[calc(100vw-60vw-268px)] w-full mt-2 px-2 pb-2 bg-bg_color ml-2 overflow-auto"
       >
-        <!-- 右侧的树状结构 -->
-        <div class="flex justify-between w-full px-3 pt-5 pb-4">
-          <div class="flex">
-            <span :class="iconClass">
-              <IconifyIconOffline
-                v-tippy="{
-                  content: '关闭'
-                }"
-                class="dark:text-white"
-                width="18px"
-                height="18px"
-                :icon="Close"
-                @click="handlePermission"
+        <div class="flex">
+          <!-- 左侧的 Tab -->
+          <div class="tabs-container">
+            <el-tabs
+              v-model="activeTab"
+              tab-position="left"
+              @tab-click="tabClick"
+            >
+              <el-tab-pane
+                v-for="item in treeDataAll"
+                :key="item.id"
+                :name="item.id"
+                :label="item.name"
               />
-            </span>
-            <span :class="[iconClass, 'ml-2']">
-              <IconifyIconOffline
-                v-tippy="{
-                  content: '保存菜单权限'
-                }"
-                class="dark:text-white"
-                width="18px"
-                height="18px"
-                :icon="Check"
-                @click="handleSave"
-              />
-            </span>
+            </el-tabs>
           </div>
-          <p class="font-bold truncate">
-            菜单权限
-            {{ `${curRow?.name ? `（${curRow.name}）` : ""}` }}
-          </p>
+          <div class="flex-1 ml-4">
+            <div class="flex justify-between w-full px-3 pt-5 pb-4">
+              <div class="flex">
+                <span :class="iconClass">
+                  <IconifyIconOffline
+                    v-tippy="{
+                      content: '关闭'
+                    }"
+                    class="dark:text-white"
+                    width="18px"
+                    height="18px"
+                    :icon="Close"
+                    @click="handlePermission"
+                  />
+                </span>
+                <span :class="[iconClass, 'ml-2']">
+                  <IconifyIconOffline
+                    v-tippy="{
+                      content: '保存菜单权限'
+                    }"
+                    class="dark:text-white"
+                    width="18px"
+                    height="18px"
+                    :icon="Check"
+                    @click="handleSave"
+                  />
+                </span>
+              </div>
+              <p class="font-bold truncate">
+                菜单权限
+                {{ `${curRow?.name ? `（${curRow.name}）` : ""}` }}
+              </p>
+            </div>
+            <el-input
+              v-model="treeSearchValue"
+              placeholder="请输入菜单进行搜索"
+              class="mb-1"
+              clearable
+              @input="onQueryChanged"
+            />
+            <div class="flex flex-wrap">
+              <el-checkbox v-model="isExpandAll" label="展开/折叠" />
+              <el-checkbox v-model="isSelectAll" label="全选/全不选" />
+              <el-checkbox v-model="isLinkage" label="父子联动" />
+            </div>
+            <div class="tree-container">
+              <!-- 右侧的树状结构 -->
+              <el-tree-v2
+                ref="treeRef"
+                show-checkbox
+                :data="treeData"
+                :props="treeProps"
+                :height="treeHeight"
+                :check-strictly="!isLinkage"
+                :filter-method="filterMethod"
+              >
+                <template #default="{ node }">
+                  <span>{{ transformI18n(node.label) }}</span>
+                </template>
+              </el-tree-v2>
+            </div>
+          </div>
         </div>
-        <el-input
-          v-model="treeSearchValue"
-          placeholder="请输入菜单进行搜索"
-          class="mb-1"
-          clearable
-          @input="onQueryChanged"
-        />
-        <div class="flex flex-wrap">
-          <el-checkbox v-model="isExpandAll" label="展开/折叠" />
-          <el-checkbox v-model="isSelectAll" label="全选/全不选" />
-          <el-checkbox v-model="isLinkage" label="父子联动" />
-        </div>
-        <el-tree-v2
-          ref="treeRef"
-          show-checkbox
-          :data="treeData"
-          :props="treeProps"
-          :height="treeHeight"
-          :check-strictly="!isLinkage"
-          :filter-method="filterMethod"
-        >
-          <template #default="{ node }">
-            <span>{{ transformI18n(node.label) }}</span>
-          </template>
-        </el-tree-v2>
       </div>
     </div>
   </div>
@@ -307,5 +331,16 @@ onMounted(() => {
   :deep(.el-form-item) {
     margin-bottom: 12px;
   }
+}
+
+.tabs-container {
+  margin-top: 140px; /* 设置 Tab 的上边距 */
+}
+
+/* 右侧树状结构的样式 */
+.tree-container {
+  padding: 16px;
+  border: 1px solid #e0e0e0; /* 树的边框 */
+  border-radius: 4px; /* 圆角 */
 }
 </style>

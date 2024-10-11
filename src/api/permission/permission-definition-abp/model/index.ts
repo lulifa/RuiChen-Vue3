@@ -31,6 +31,8 @@ export interface PermissionGroup {
 
 export interface PermissionTree {
   isRoot: boolean;
+  /** 权限分组 */
+  group: string;
   /** 权限标识 */
   id: string;
   /** 显示名称 */

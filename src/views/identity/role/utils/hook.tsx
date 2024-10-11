@@ -4,7 +4,7 @@ import { message } from "@/utils/message";
 import { transformI18n } from "@/plugins/i18n";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
-import { deviceDetection } from "@pureadmin/utils";
+import { deviceDetection, getKeyList } from "@pureadmin/utils";
 import {
   type Ref,
   reactive,
@@ -13,7 +13,8 @@ import {
   h,
   toRaw,
   watch,
-  computed
+  computed,
+  nextTick
 } from "vue";
 import type { FormProps, FormItemProps } from "../utils/types";
 import {
@@ -24,7 +25,10 @@ import {
   getList
 } from "@/api/identity/identity-role";
 import type { GetRolePagedRequest } from "@/api/identity/identity-role/model";
-import { get as getAbpPermissions } from "@/api/permission/permission-definition-abp";
+import {
+  get as getAbpPermissions,
+  update as updateAbpPermissions
+} from "@/api/permission/permission-definition-abp";
 import type {
   PermissionGroup,
   PermissionProvider,
@@ -40,6 +44,8 @@ export function useRole(treeRef: Ref) {
   const formRef = ref();
   const dataList = ref([]);
   const treeIds = ref([]);
+  const treeDataAll = ref<PermissionTree[]>([]);
+  const activeTab = ref(null);
   const treeData = ref<PermissionTree[]>([]);
   const isShow = ref(false);
   const loading = ref(true);
@@ -217,47 +223,39 @@ export function useRole(treeRef: Ref) {
     if (id) {
       curRow.value = row;
       isShow.value = true;
+
       permissionQuery.providerKey = row?.name;
       const data = await getAbpPermissions(permissionQuery);
       const nodes = generatePermissionTreeRoot(data.groups);
-      const treenodes = nodes
-        .filter(item => item.isRoot)
-        .flatMap(root => root.children);
+
+      treeDataAll.value = nodes.filter(item => item.isRoot);
+      activeTab.value = treeDataAll.value[0]?.id || null;
+      const treenodes = treeDataAll.value.flatMap(root => root.children);
 
       treeData.value = handleTree(treenodes);
-      // treeRef.value.setCheckedKeys(data);
+      treeIds.value = getKeyList(treenodes, "id");
+      const checkedKeys = getKeyList(
+        treenodes.filter(v => v.isGranted),
+        "id"
+      );
+
+      await nextTick();
+      setTimeout(() => {
+        tabCore(activeTab.value);
+        treeRef.value.setCheckedKeys(checkedKeys);
+      }, 0);
     } else {
       curRow.value = null;
       isShow.value = false;
     }
   }
 
-  // function generatePermissionTree(permissionGroups: PermissionGroup[]) {
-  //   const trees: PermissionTree[] = [];
-  //   permissionGroups.forEach(g => {
-  //     g.permissions.forEach(p => {
-  //       const tree: PermissionTree = {
-  //         isRoot: false,
-  //         id: p.name,
-  //         parentId: p.parentName,
-  //         name: p.displayName,
-  //         disabled: false,
-  //         children: [],
-  //         isGranted: p.isGranted,
-  //         grantedProviders: p.grantedProviders,
-  //         allowedProviders: p.allowedProviders
-  //       };
-  //       trees.push(tree);
-  //     });
-  //   });
-  //   return trees;
-  // }
-
   function generatePermissionTreeRoot(permissionGroups: PermissionGroup[]) {
     const trees: PermissionTree[] = [];
     permissionGroups.forEach(g => {
       const root: PermissionTree = {
         isRoot: true,
+        group: null,
         id: g.name,
         parentId: g.name,
         name: g.displayName,
@@ -271,6 +269,7 @@ export function useRole(treeRef: Ref) {
       g.permissions.forEach(p => {
         const tree: PermissionTree = {
           isRoot: false,
+          group: g.name,
           id: p.name,
           parentId: p.parentName,
           name: p.displayName,
@@ -298,17 +297,14 @@ export function useRole(treeRef: Ref) {
   }
 
   /** 菜单权限-保存 */
-  function handleSave() {
-    const { id, name } = curRow.value;
+  async function handleSave() {
     const arr = [];
     for (let node of treeData.value) {
-      traverseTree(node.children, arr);
+      traverseTree(node, arr);
     }
-    // 根据用户 id 调用实际项目中菜单权限修改接口
-    console.log(id, treeRef.value.getCheckedKeys());
-    message(`角色名称为${name}的菜单权限修改成功`, {
-      type: "success"
-    });
+    await updateAbpPermissions(permissionQuery, { permissions: arr });
+    curRow.value = null;
+    isShow.value = false;
   }
 
   function traverseTree(node, arr) {
@@ -336,8 +332,17 @@ export function useRole(treeRef: Ref) {
   };
 
   const filterMethod = (query: string, node) => {
-    return transformI18n(node.title)!.includes(query);
+    return transformI18n(node.group)!.includes(query);
   };
+
+  const tabClick = tab => {
+    tabCore(tab.paneName);
+  };
+
+  function tabCore(name: string) {
+    activeTab.value = name;
+    treeRef.value!.filter(name);
+  }
 
   onMounted(async () => {
     onSearch();
@@ -363,7 +368,10 @@ export function useRole(treeRef: Ref) {
     columns,
     rowStyle,
     dataList,
+    activeTab,
+    treeDataAll,
     treeData,
+    tabClick,
     treeProps,
     isLinkage,
     pagination,
