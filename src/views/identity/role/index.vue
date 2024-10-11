@@ -287,7 +287,7 @@ onMounted(() => {
               <el-checkbox v-model="isSelectAll" label="全选/全不选" />
               <el-checkbox v-model="isLinkage" label="父子联动" />
             </div>
-            <div class="tree-container">
+            <div>
               <!-- 右侧的树状结构 -->
               <el-tree-v2
                 ref="treeRef"
@@ -334,13 +334,32 @@ onMounted(() => {
 }
 
 .tabs-container {
-  margin-top: 140px; /* 设置 Tab 的上边距 */
+  margin-top: 125px; /* 设置 Tab 的上边距 */
 }
 
-/* 右侧树状结构的样式 */
-.tree-container {
-  padding: 16px;
-  border: 1px solid #e0e0e0; /* 树的边框 */
+/* 确保覆盖 Element Plus 的样式 */
+:deep(.el-tabs__header) {
+  width: 100%; /* 确保标签头部宽度为100% */
+}
+
+/* 隐藏 tab pane 的内容 */
+:deep(.el-tab-pane) {
+  display: none; /* 隐藏内容，确保没有内容展示 */
+}
+
+/* 为标签项添加样式，使其看起来像卡片 */
+:deep(.el-tabs__item) {
+  border: 1px solid #a8d8ea; /* 更改边框颜色为更浅的蓝色 */
   border-radius: 4px; /* 圆角 */
+  margin-bottom: 10px; /* 标签之间的间距 */
+  background-color: #f0f8ff; /* 浅蓝色背景 */
+  padding: 10px; /* 内边距 */
+  transition: box-shadow 0.3s; /* 过渡效果 */
+  text-align: center !important; /* 强制文本居中 */
+}
+
+/* 鼠标悬停时的效果 */
+:deep(.el-tabs__item:hover) {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加阴影 */
 }
 </style>
