@@ -358,8 +358,14 @@ onMounted(() => {
   text-align: center !important; /* 强制文本居中 */
 }
 
-/* 鼠标悬停时的效果 */
+:deep(.el-tabs__item.is-active) {
+  background-color: #a8d8ea; /* 选中状态的背景色 */
+  color: #fff; /* 选中状态的文字颜色 */
+  border: 1px solid #a8d8ea; /* 边框颜色可以根据需要调整 */
+}
+
+/* 悬停状态 */
 :deep(.el-tabs__item:hover) {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加阴影 */
+  background-color: #e0f7fa; /* 悬停状态的背景色 */
 }
 </style>
