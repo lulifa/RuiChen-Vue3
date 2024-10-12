@@ -11,7 +11,12 @@ import Check from "@iconify-icons/ep/check";
 import Close from "@iconify-icons/ep/close";
 
 import type { FormProps, FormItemProps } from "../utils/types";
-import { getKeyList, isAllEmpty, deviceDetection } from "@pureadmin/utils";
+import {
+  getKeyList,
+  isAllEmpty,
+  deviceDetection,
+  hideTextAtIndex
+} from "@pureadmin/utils";
 import { ElForm, ElInput, ElFormItem, ElProgress } from "element-plus";
 import {
   type Ref,
@@ -108,7 +113,9 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           >
             {row.phoneNumberConfirmed ? "已确认" : "未确认"}
           </el-tag>
-          <span style="margin-left:20px;">{row.phoneNumber}</span>
+          <span style="margin-left:20px;">
+            {hideTextAtIndex(row.phoneNumber, { start: 3, end: 6 })}
+          </span>
         </div>
       )
     },
