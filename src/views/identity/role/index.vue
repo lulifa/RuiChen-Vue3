@@ -56,8 +56,8 @@ const {
   rowStyle,
   dataList,
   activeTab,
-  treeDataAll,
-  treeData,
+  treeDataPermAll,
+  treeDataPerm,
   tabClick,
   treeProps,
   isLinkage,
@@ -235,7 +235,7 @@ onMounted(() => {
               @tab-click="tabClick"
             >
               <el-tab-pane
-                v-for="item in treeDataAll"
+                v-for="item in treeDataPermAll"
                 :key="item.id"
                 :name="item.id"
                 :label="item.name"
@@ -287,12 +287,12 @@ onMounted(() => {
               <el-checkbox v-model="isSelectAll" label="全选/全不选" />
               <el-checkbox v-model="isLinkage" label="父子联动" />
             </div>
-            <div>
+            <div class="tree-container">
               <!-- 右侧的树状结构 -->
               <el-tree-v2
                 ref="treeRef"
                 show-checkbox
-                :data="treeData"
+                :data="treeDataPerm"
                 :props="treeProps"
                 :height="treeHeight"
                 :check-strictly="!isLinkage"
@@ -334,7 +334,12 @@ onMounted(() => {
 }
 
 .tabs-container {
-  margin-top: 60px; /* 设置 Tab 的上边距 */
+  margin-top: 130px; /* 设置 Tab 的上边距 */
+}
+
+.tree-container {
+  border: 1px solid #e0e0e0; /* 树的边框 */
+  border-radius: 4px;
 }
 
 /* 确保覆盖 Element Plus 的样式 */

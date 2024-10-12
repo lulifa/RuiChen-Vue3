@@ -43,10 +43,10 @@ export function useRole(treeRef: Ref) {
   const curRow = ref();
   const formRef = ref();
   const dataList = ref([]);
-  const treeIds = ref([]);
-  const treeDataAll = ref<PermissionTree[]>([]);
+  const treePermIds = ref([]);
+  const treeDataPermAll = ref<PermissionTree[]>([]);
   const activeTab = ref(null);
-  const treeData = ref<PermissionTree[]>([]);
+  const treeDataPerm = ref<PermissionTree[]>([]);
   const isShow = ref(false);
   const loading = ref(true);
   const isLinkage = ref(false);
@@ -228,12 +228,12 @@ export function useRole(treeRef: Ref) {
       const data = await getAbpPermissions(permissionQuery);
       const nodes = generatePermissionTreeRoot(data.groups);
 
-      treeDataAll.value = nodes.filter(item => item.isRoot);
-      activeTab.value = treeDataAll.value[0]?.id || null;
-      const treenodes = treeDataAll.value.flatMap(root => root.children);
+      treeDataPermAll.value = nodes.filter(item => item.isRoot);
+      activeTab.value = treeDataPermAll.value[0]?.id || null;
+      const treenodes = treeDataPermAll.value.flatMap(root => root.children);
 
-      treeData.value = handleTree(treenodes);
-      treeIds.value = getKeyList(treenodes, "id");
+      treeDataPerm.value = handleTree(treenodes);
+      treePermIds.value = getKeyList(treenodes, "id");
       const checkedKeys = getKeyList(
         treenodes.filter(v => v.isGranted),
         "id"
@@ -299,7 +299,7 @@ export function useRole(treeRef: Ref) {
   /** 菜单权限-保存 */
   async function handleSave() {
     const arr = [];
-    for (let node of treeData.value) {
+    for (let node of treeDataPerm.value) {
       traverseTree(node, arr);
     }
     await updateAbpPermissions(permissionQuery, { permissions: arr });
@@ -352,13 +352,13 @@ export function useRole(treeRef: Ref) {
     debugger;
     alert(val);
     val
-      ? treeRef.value.setExpandedKeys(treeIds.value)
+      ? treeRef.value.setExpandedKeys(treePermIds.value)
       : treeRef.value.setExpandedKeys([]);
   });
 
   watch(isSelectAll, val => {
     val
-      ? treeRef.value.setCheckedKeys(treeIds.value)
+      ? treeRef.value.setCheckedKeys(treePermIds.value)
       : treeRef.value.setCheckedKeys([]);
   });
 
@@ -371,8 +371,8 @@ export function useRole(treeRef: Ref) {
     rowStyle,
     dataList,
     activeTab,
-    treeDataAll,
-    treeData,
+    treeDataPermAll,
+    treeDataPerm,
     tabClick,
     treeProps,
     isLinkage,
