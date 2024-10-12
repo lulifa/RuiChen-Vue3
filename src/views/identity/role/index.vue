@@ -339,12 +339,12 @@ onMounted(() => {
 
 /* 确保覆盖 Element Plus 的样式 */
 :deep(.el-tabs__header) {
-  width: 100%; /* 确保标签头部宽度为100% */
+  width: 100% !important; /* 确保标签头部宽度为100% */
 }
 
 /* 隐藏 tab pane 的内容 */
 :deep(.el-tab-pane) {
-  display: none; /* 隐藏内容，确保没有内容展示 */
+  display: none !important; /* 隐藏内容，确保没有内容展示 */
 }
 
 /* 为标签项添加样式，使其看起来像卡片 */
