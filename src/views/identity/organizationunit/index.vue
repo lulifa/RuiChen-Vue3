@@ -141,7 +141,7 @@ const {
                       :icon="useRenderIcon(AddFill)"
                       @click="openDialog('新增', { parentId: row.id } as any)"
                     >
-                      新增子机构
+                      子机构
                     </el-button>
                   </el-dropdown-item>
                 </el-dropdown-menu>
