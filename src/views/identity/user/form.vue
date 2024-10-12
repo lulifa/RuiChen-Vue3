@@ -148,6 +148,7 @@ defineExpose({ getRef });
             show-checkbox
             :data="newFormInline.higherDeptOptions"
             :default-checked-keys="newFormInline.organizationUnitIds"
+            check-strictly
             :props="{
               value: 'id',
               label: 'name',
