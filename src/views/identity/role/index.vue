@@ -334,7 +334,7 @@ onMounted(() => {
 }
 
 .tabs-container {
-  margin-top: 125px; /* 设置 Tab 的上边距 */
+  margin-top: 60px; /* 设置 Tab 的上边距 */
 }
 
 /* 确保覆盖 Element Plus 的样式 */
@@ -355,12 +355,12 @@ onMounted(() => {
   background-color: #f0f8ff; /* 浅蓝色背景 */
   padding: 10px; /* 内边距 */
   transition: box-shadow 0.3s; /* 过渡效果 */
-  text-align: center !important; /* 强制文本居中 */
+  justify-content: center !important;
 }
 
 :deep(.el-tabs__item.is-active) {
   background-color: #a8d8ea; /* 选中状态的背景色 */
-  color: #fff; /* 选中状态的文字颜色 */
+  color: #7b7dc9; /* 选中状态的文字颜色 */
   border: 1px solid #a8d8ea; /* 边框颜色可以根据需要调整 */
 }
 

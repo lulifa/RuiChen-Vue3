@@ -349,6 +349,8 @@ export function useRole(treeRef: Ref) {
   });
 
   watch(isExpandAll, val => {
+    debugger;
+    alert(val);
     val
       ? treeRef.value.setExpandedKeys(treeIds.value)
       : treeRef.value.setExpandedKeys([]);
