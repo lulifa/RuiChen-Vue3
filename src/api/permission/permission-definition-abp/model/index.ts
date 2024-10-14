@@ -37,6 +37,7 @@ export interface PermissionTree {
   id: string;
   /** 显示名称 */
   name: string;
+  label: string;
   /** 是否授权 */
   isGranted?: boolean;
   /** 是否禁用 */

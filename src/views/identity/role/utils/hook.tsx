@@ -1,4 +1,5 @@
 import editForm from "../form.vue";
+import editformpermission from "@/views/identity/components/permtree/role/index.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
 import { transformI18n } from "@/plugins/i18n";
@@ -250,6 +251,39 @@ export function useRole(treeRef: Ref) {
     }
   }
 
+  /** 测试权限 */
+  async function handlePermissionTest(row?: any) {
+    addDialog({
+      title: `角色权限树`,
+      props: {
+        formInline: {
+          curRow: row
+        }
+      },
+      width: "45%",
+      draggable: true,
+      fullscreen: deviceDetection(),
+      fullscreenIcon: false,
+      closeOnClickModal: false,
+      contentRenderer: () => h(editformpermission, { ref: formRef }),
+      beforeSure: (done, { options }) => {
+        const FormRef = formRef.value.getRef();
+        const curData = options.props.formInline as FormItemProps;
+        function chores() {
+          done(); // 关闭弹框
+          onSearch(); // 刷新表格数据
+        }
+        FormRef.validate(async valid => {
+          if (valid) {
+            console.log("curData", curData);
+            // 表单规则校验通过
+            chores();
+          }
+        });
+      }
+    });
+  }
+
   function generatePermissionTreeRoot(permissionGroups: PermissionGroup[]) {
     const trees: PermissionTree[] = [];
     permissionGroups.forEach(g => {
@@ -259,6 +293,7 @@ export function useRole(treeRef: Ref) {
         id: g.name,
         parentId: g.name,
         name: g.displayName,
+        label: g.displayName,
         disabled: true,
         children: [],
         isGranted: false,
@@ -273,6 +308,7 @@ export function useRole(treeRef: Ref) {
           id: p.name,
           parentId: p.parentName,
           name: p.displayName,
+          label: p.displayName,
           disabled: false,
           children: [],
           isGranted: p.isGranted,
@@ -349,8 +385,6 @@ export function useRole(treeRef: Ref) {
   });
 
   watch(isExpandAll, val => {
-    debugger;
-    alert(val);
     val
       ? treeRef.value.setExpandedKeys(treePermIds.value)
       : treeRef.value.setExpandedKeys([]);
@@ -385,6 +419,7 @@ export function useRole(treeRef: Ref) {
     resetForm,
     openDialog,
     handlePermission,
+    handlePermissionTest,
     handleSave,
     handleDelete,
     filterMethod,

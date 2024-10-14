@@ -70,6 +70,7 @@ const {
   resetForm,
   openDialog,
   handlePermission,
+  handlePermissionTest,
   handleSave,
   handleDelete,
   filterMethod,
@@ -212,6 +213,18 @@ onMounted(() => {
                         @click="handlePermission(row)"
                       >
                         权限
+                      </el-button>
+                    </el-dropdown-item>
+                    <el-dropdown-item>
+                      <el-button
+                        :class="buttonClass"
+                        link
+                        type="primary"
+                        :size="size"
+                        :icon="useRenderIcon(Menu)"
+                        @click="handlePermissionTest(row)"
+                      >
+                        测试组件权限
                       </el-button>
                     </el-dropdown-item>
                   </el-dropdown-menu>
