@@ -108,7 +108,7 @@ const {
           >
             <template #operation="{ row }">
               <el-popconfirm
-                :title="`你确定要从组织机构中删除角色${row.name}吗?`"
+                :title="`你确定要从组织机构中移除角色${row.name}吗?`"
                 @confirm="handleDelete(row)"
               >
                 <template #reference>
@@ -119,7 +119,7 @@ const {
                     :size="size"
                     :icon="useRenderIcon(Delete)"
                   >
-                    删除
+                    移除
                   </el-button>
                 </template>
               </el-popconfirm>
