@@ -28,6 +28,11 @@ const {
   handleDelete,
   handleSelectionChange
 } = useDept();
+
+function onFullscreen() {
+  // 重置表格高度
+  tableRef.value.setAdaptive();
+}
 </script>
 
 <template>
@@ -65,6 +70,7 @@ const {
       :columns="columns"
       :tableRef="tableRef?.getTableRef()"
       @refresh="onSearch"
+      @fullscreen="onFullscreen"
     >
       <template #buttons>
         <el-button
