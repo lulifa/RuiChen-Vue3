@@ -1,5 +1,6 @@
 import "./reset.css";
 import editForm from "../form.vue";
+import editformpermission from "@/views/identity/components/permtree/index.vue";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
@@ -154,7 +155,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "操作",
       fixed: "right",
-      width: 180,
+      width: 200,
       slot: "operation"
     }
   ];
@@ -368,6 +369,29 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     return props;
   }
 
+  /** 权限 */
+  async function handlePermission(row?: any) {
+    addDialog({
+      title: `权限-${row?.name}`,
+      props: {
+        formInline: {
+          providerName: "U",
+          curRow: row
+        }
+      },
+      closeOnClickModal: false,
+      fullscreen: deviceDetection(),
+      contentRenderer: () => h(editformpermission, { ref: formRef }),
+      beforeSure: (done, { options }) => {
+        const curData = options.props.formInline as FormItemProps;
+        console.log(curData);
+        formRef.value.handleSave();
+        done(); // 关闭弹框
+        onSearch(); // 刷新表格数据
+      }
+    });
+  }
+
   const cropRef = ref();
   /** 上传头像 */
   function handleUpload(row) {
@@ -501,6 +525,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     resetForm,
     onbatchDel,
     openDialog,
+    handlePermission,
     onTreeSelect,
     handleUpdate,
     handleDelete,

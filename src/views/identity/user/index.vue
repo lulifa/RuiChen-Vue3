@@ -10,6 +10,7 @@ import Delete from "@iconify-icons/ep/delete";
 import EditPen from "@iconify-icons/ep/edit-pen";
 import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
+import Menu from "@iconify-icons/ep/menu";
 
 defineOptions({
   name: "SystemUser"
@@ -34,6 +35,7 @@ const {
   resetForm,
   onbatchDel,
   openDialog,
+  handlePermission,
   onTreeSelect,
   handleUpdate,
   handleDelete,
@@ -205,6 +207,18 @@ const {
                 />
                 <template #dropdown>
                   <el-dropdown-menu>
+                    <el-dropdown-item>
+                      <el-button
+                        :class="buttonClass"
+                        link
+                        type="primary"
+                        :size="size"
+                        :icon="useRenderIcon(Menu)"
+                        @click="handlePermission(row)"
+                      >
+                        用户权限
+                      </el-button>
+                    </el-dropdown-item>
                     <el-dropdown-item>
                       <el-button
                         :class="buttonClass"

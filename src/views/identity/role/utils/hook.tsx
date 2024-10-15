@@ -1,22 +1,11 @@
 import editForm from "../form.vue";
 import editformpermission from "@/views/identity/components/permtree/index.vue";
-import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
 import { transformI18n } from "@/plugins/i18n";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
-import { deviceDetection, getKeyList } from "@pureadmin/utils";
-import {
-  type Ref,
-  reactive,
-  ref,
-  onMounted,
-  h,
-  toRaw,
-  watch,
-  computed,
-  nextTick
-} from "vue";
+import { deviceDetection } from "@pureadmin/utils";
+import { reactive, ref, onMounted, h, toRaw, computed } from "vue";
 import type { FormProps, FormItemProps } from "../utils/types";
 import {
   create,
@@ -26,43 +15,15 @@ import {
   getList
 } from "@/api/identity/identity-role";
 import type { GetRolePagedRequest } from "@/api/identity/identity-role/model";
-import {
-  get as getAbpPermissions,
-  update as updateAbpPermissions
-} from "@/api/permission/permission-definition-abp";
-import type {
-  PermissionGroup,
-  PermissionProvider,
-  PermissionTree
-} from "@/api/permission/permission-definition-abp/model";
 
-export function useRole(treeRef: Ref) {
+export function useRole() {
   interface CustomForm extends Partial<GetRolePagedRequest> {
     // 添加自定义字段
   }
   const form = reactive<CustomForm>({});
-  const curRow = ref();
   const formRef = ref();
   const dataList = ref([]);
-  const treePermIds = ref([]);
-  const treeDataPermAll = ref<PermissionTree[]>([]);
-  const activeTab = ref(null);
-  const treeDataPerm = ref<PermissionTree[]>([]);
-  const isShow = ref(false);
   const loading = ref(true);
-  const isLinkage = ref(false);
-  const treeSearchValue = ref();
-  const isExpandAll = ref(false);
-  const isSelectAll = ref(false);
-  const treeProps = {
-    value: "id",
-    label: "name",
-    children: "children"
-  };
-  const permissionQuery: PermissionProvider = {
-    providerKey: "",
-    providerName: "R"
-  };
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
@@ -103,7 +64,7 @@ export function useRole(treeRef: Ref) {
     {
       label: "操作",
       fixed: "right",
-      width: 210,
+      width: 200,
       slot: "operation"
     }
   ];
@@ -220,41 +181,8 @@ export function useRole(treeRef: Ref) {
 
   /** 权限 */
   async function handlePermission(row?: any) {
-    const { id } = row;
-    if (id) {
-      curRow.value = row;
-      isShow.value = true;
-
-      permissionQuery.providerKey = row?.name;
-      const data = await getAbpPermissions(permissionQuery);
-      const nodes = generatePermissionTreeRoot(data.groups);
-
-      treeDataPermAll.value = nodes.filter(item => item.isRoot);
-      activeTab.value = treeDataPermAll.value[0]?.id || null;
-      const treenodes = treeDataPermAll.value.flatMap(root => root.children);
-
-      treeDataPerm.value = handleTree(treenodes);
-      treePermIds.value = getKeyList(treenodes, "id");
-      const checkedKeys = getKeyList(
-        treenodes.filter(v => v.isGranted),
-        "id"
-      );
-
-      await nextTick();
-      setTimeout(() => {
-        tabCore(activeTab.value);
-        treeRef.value.setCheckedKeys(checkedKeys);
-      }, 0);
-    } else {
-      curRow.value = null;
-      isShow.value = false;
-    }
-  }
-
-  /** 测试权限 */
-  async function handlePermissionTest(row?: any) {
     addDialog({
-      title: `角色权限-${row?.name}`,
+      title: `权限-${row?.name}`,
       props: {
         formInline: {
           providerName: "R",
@@ -262,6 +190,7 @@ export function useRole(treeRef: Ref) {
         }
       },
       closeOnClickModal: false,
+      fullscreen: deviceDetection(),
       contentRenderer: () => h(editformpermission, { ref: formRef }),
       beforeSure: (done, { options }) => {
         const curData = options.props.formInline as FormItemProps;
@@ -273,147 +202,26 @@ export function useRole(treeRef: Ref) {
     });
   }
 
-  function generatePermissionTreeRoot(permissionGroups: PermissionGroup[]) {
-    const trees: PermissionTree[] = [];
-    permissionGroups.forEach(g => {
-      const root: PermissionTree = {
-        isRoot: true,
-        group: null,
-        id: g.name,
-        parentId: g.name,
-        name: g.displayName,
-        label: g.displayName,
-        disabled: true,
-        children: [],
-        isGranted: false,
-        grantedProviders: [],
-        allowedProviders: []
-      };
-      let rootChildren: PermissionTree[] = [];
-      g.permissions.forEach(p => {
-        const tree: PermissionTree = {
-          isRoot: false,
-          group: g.name,
-          id: p.name,
-          parentId: p.parentName,
-          name: p.displayName,
-          label: p.displayName,
-          disabled: false,
-          children: [],
-          isGranted: p.isGranted,
-          grantedProviders: p.grantedProviders,
-          allowedProviders: p.allowedProviders
-        };
-        rootChildren.push(tree);
-      });
-      root.children = rootChildren;
-
-      trees.push(root);
-    });
-    return trees;
-  }
-
-  /** 高亮当前权限选中行 */
-  function rowStyle({ row: { id } }) {
-    return {
-      cursor: "pointer",
-      background: id === curRow.value?.id ? "var(--el-fill-color-light)" : ""
-    };
-  }
-
-  /** 菜单权限-保存 */
-  async function handleSave() {
-    const arr = [];
-    for (let node of treeDataPerm.value) {
-      traverseTree(node, arr);
-    }
-    await updateAbpPermissions(permissionQuery, { permissions: arr });
-    curRow.value = null;
-    isShow.value = false;
-  }
-
-  function traverseTree(node, arr) {
-    const newcheckedKeys = treeRef.value.getCheckedKeys();
-    const isChecked = newcheckedKeys.includes(node.id);
-
-    // 处理当前节点
-    if (node.isGranted !== isChecked) {
-      arr.push({
-        isGranted: !node.isGranted,
-        name: node.id
-      });
-    }
-    // 处理子节点
-    if (node.children) {
-      node.children.forEach(child => traverseTree(child, arr));
-    }
-  }
-
   /** 数据权限 可自行开发 */
   // function handleDatabase() {}
-
-  const onQueryChanged = (query: string) => {
-    treeRef.value!.filter(query);
-  };
-
-  const filterMethod = (query: string, node) => {
-    return transformI18n(node.group)!.includes(query);
-  };
-
-  const tabClick = tab => {
-    tabCore(tab.paneName);
-  };
-
-  function tabCore(name: string) {
-    activeTab.value = name;
-    treeRef.value!.filter(name);
-  }
 
   onMounted(async () => {
     onSearch();
   });
 
-  watch(isExpandAll, val => {
-    val
-      ? treeRef.value.setExpandedKeys(treePermIds.value)
-      : treeRef.value.setExpandedKeys([]);
-  });
-
-  watch(isSelectAll, val => {
-    val
-      ? treeRef.value.setCheckedKeys(treePermIds.value)
-      : treeRef.value.setCheckedKeys([]);
-  });
-
   return {
     form,
-    isShow,
-    curRow,
     loading,
     columns,
-    rowStyle,
     dataList,
-    activeTab,
-    treeDataPermAll,
-    treeDataPerm,
-    tabClick,
-    treeProps,
-    isLinkage,
     pagination,
-    isExpandAll,
-    isSelectAll,
-    treeSearchValue,
     buttonClass,
     onSearch,
     resetForm,
     openDialog,
     handlePermission,
-    handlePermissionTest,
-    handleSave,
     handleDelete,
-    filterMethod,
     transformI18n,
-    onQueryChanged,
     // handleDatabase,
     handleSizeChange,
     handleCurrentChange,

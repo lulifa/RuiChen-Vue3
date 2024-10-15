@@ -83,7 +83,7 @@ function genePermissionTreeRoot(permissionGroups: PermissionGroup[]) {
         parentId: p.parentName,
         name: p.displayName,
         label: p.displayName,
-        disabled: false,
+        disabled: hasOtherProvider(p.grantedProviders),
         children: [],
         isGranted: p.isGranted,
         grantedProviders: p.grantedProviders,
@@ -97,6 +97,12 @@ function genePermissionTreeRoot(permissionGroups: PermissionGroup[]) {
   });
   return trees;
 }
+function hasOtherProvider(grantedProviders) {
+  return grantedProviders.some(
+    p => p.providerName !== permissionQuery.providerName
+  );
+}
+
 function traverseTree(node, arr) {
   const newcheckedKeys = treeRef.value.getCheckedKeys();
   const isChecked = newcheckedKeys.includes(node.id);
