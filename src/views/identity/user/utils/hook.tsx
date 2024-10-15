@@ -19,16 +19,7 @@ import {
   hideTextAtIndex
 } from "@pureadmin/utils";
 import { ElForm, ElInput, ElFormItem, ElProgress } from "element-plus";
-import {
-  type Ref,
-  h,
-  ref,
-  toRaw,
-  watch,
-  computed,
-  reactive,
-  onMounted
-} from "vue";
+import { type Ref, h, ref, toRaw, watch, reactive, onMounted } from "vue";
 
 import {
   getAssignableRoles,
@@ -159,15 +150,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       slot: "operation"
     }
   ];
-  const buttonClass = computed(() => {
-    return [
-      "!h-[20px]",
-      "reset-margin",
-      "!text-gray-500",
-      "dark:!text-white",
-      "dark:hover:!text-primary"
-    ];
-  });
+
   // 重置的新密码
   const pwdForm = reactive({
     newPwd: ""
@@ -519,7 +502,6 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     treeLoading,
     selectedNum,
     pagination,
-    buttonClass,
     deviceDetection,
     onSearch,
     resetForm,
