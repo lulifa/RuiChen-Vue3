@@ -212,7 +212,7 @@ const {
                         type="primary"
                         :size="size"
                         :icon="useRenderIcon(Menu)"
-                        @click="handlePermission(row)"
+                        @click="handlePermission(row, 'drawer')"
                       >
                         用户权限
                       </el-button>

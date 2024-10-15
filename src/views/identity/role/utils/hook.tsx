@@ -3,6 +3,7 @@ import editformpermission from "@/views/identity/components/permtree/index.vue";
 import { message } from "@/utils/message";
 import { transformI18n } from "@/plugins/i18n";
 import { addDialog } from "@/components/ReDialog";
+import { addDrawer } from "@/components/ReDrawer";
 import type { PaginationProps } from "@pureadmin/table";
 import { deviceDetection } from "@pureadmin/utils";
 import { reactive, ref, onMounted, h, toRaw } from "vue";
@@ -169,27 +170,50 @@ export function useRole() {
     return props;
   }
 
-  /** 权限 */
-  async function handlePermission(row?: any) {
-    addDialog({
-      title: `权限-${row?.name}`,
-      props: {
-        formInline: {
-          providerName: "R",
-          curRow: row
+  /** 权限 抽屉和弹出框两种模式 */
+  async function handlePermission(row?: any, type = "dialog") {
+    if (type == "drawer") {
+      addDrawer({
+        title: `权限-${row?.name}`,
+        size: "40%",
+        props: {
+          formInline: {
+            providerName: "R",
+            curRow: row
+          }
+        },
+        closeOnClickModal: false,
+        contentRenderer: () => h(editformpermission, { ref: formRef }),
+        beforeSure: (done, { options }) => {
+          const curData = options.props.formInline as FormItemProps;
+          console.log(curData);
+          formRef.value.handleSave();
+          done(); // 关闭弹框
+          onSearch(); // 刷新表格数据
         }
-      },
-      closeOnClickModal: false,
-      fullscreen: deviceDetection(),
-      contentRenderer: () => h(editformpermission, { ref: formRef }),
-      beforeSure: (done, { options }) => {
-        const curData = options.props.formInline as FormItemProps;
-        console.log(curData);
-        formRef.value.handleSave();
-        done(); // 关闭弹框
-        onSearch(); // 刷新表格数据
-      }
-    });
+      });
+    } else {
+      addDialog({
+        title: `权限-${row?.name}`,
+        width: "40%",
+        props: {
+          formInline: {
+            providerName: "R",
+            curRow: row
+          }
+        },
+        closeOnClickModal: false,
+        fullscreen: deviceDetection(),
+        contentRenderer: () => h(editformpermission, { ref: formRef }),
+        beforeSure: (done, { options }) => {
+          const curData = options.props.formInline as FormItemProps;
+          console.log(curData);
+          formRef.value.handleSave();
+          done(); // 关闭弹框
+          onSearch(); // 刷新表格数据
+        }
+      });
+    }
   }
 
   /** 数据权限 可自行开发 */
