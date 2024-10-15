@@ -254,32 +254,20 @@ export function useRole(treeRef: Ref) {
   /** 测试权限 */
   async function handlePermissionTest(row?: any) {
     addDialog({
-      title: `角色权限树`,
+      title: `角色权限-${row?.name}`,
       props: {
         formInline: {
           curRow: row
         }
       },
-      width: "45%",
-      draggable: true,
-      fullscreen: deviceDetection(),
-      fullscreenIcon: false,
       closeOnClickModal: false,
       contentRenderer: () => h(editformpermission, { ref: formRef }),
       beforeSure: (done, { options }) => {
-        const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
-        function chores() {
-          done(); // 关闭弹框
-          onSearch(); // 刷新表格数据
-        }
-        FormRef.validate(async valid => {
-          if (valid) {
-            console.log("curData", curData);
-            // 表单规则校验通过
-            chores();
-          }
-        });
+        console.log(curData);
+        formRef.value.handleSave();
+        done(); // 关闭弹框
+        onSearch(); // 刷新表格数据
       }
     });
   }

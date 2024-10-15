@@ -16,12 +16,7 @@ import { getKeyList, handleTree } from "@pureadmin/utils";
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({})
 });
-const ruleFormRef = ref();
 const newFormInline = ref(props.formInline);
-function getRef() {
-  return ruleFormRef.value;
-}
-defineExpose({ getRef });
 
 const treeProps = {
   value: "id",
@@ -32,6 +27,7 @@ const permissionQuery: PermissionProvider = {
   providerKey: "",
   providerName: "R"
 };
+const ruleFormRef = ref();
 const treeRef = ref();
 const treePermIds = ref([]);
 const treeDataPermAll = ref<PermissionTree[]>([]);
@@ -49,14 +45,12 @@ const tabClick = tab => {
 function tabCore(name: string) {
   activeTab.value = name;
   treeRef.value!.filter(name);
-  treeRef.value.setExpandedKeys([]);
 }
 const onQueryChanged = (query: string) => {
   treeRef.value!.filter(query);
 };
 
 const filterMethod = (query: string, node) => {
-  debugger;
   return (
     transformI18n(node.group)!.includes(query) ||
     transformI18n(node.label)!.includes(query)
@@ -101,6 +95,22 @@ function genePermissionTreeRoot(permissionGroups: PermissionGroup[]) {
   });
   return trees;
 }
+function traverseTree(node, arr) {
+  const newcheckedKeys = treeRef.value.getCheckedKeys();
+  const isChecked = newcheckedKeys.includes(node.id);
+
+  // 处理当前节点
+  if (node.isGranted !== isChecked) {
+    arr.push({
+      isGranted: !node.isGranted,
+      name: node.id
+    });
+  }
+  // 处理子节点
+  if (node.children) {
+    node.children.forEach(child => traverseTree(child, arr));
+  }
+}
 const loadTree = async () => {
   permissionQuery.providerKey = newFormInline.value.curRow?.name;
   const data = await getAbpPermissions(permissionQuery);
@@ -112,7 +122,7 @@ const loadTree = async () => {
   const treenodesChecked = treenodes.filter(v => v.isGranted);
 
   treeDataPerm.value = handleTree(treenodes);
-  console.log(handleTree(treenodes));
+
   treePermIds.value = getKeyList(treenodes, "id");
   checkedKeys.value = getKeyList(treenodesChecked, "id");
 };
@@ -121,6 +131,16 @@ const loadTreeOperation = async () => {
   tabCore(activeTab.value);
   treeRef.value.setCheckedKeys(checkedKeys.value);
 };
+function getRef() {
+  return ruleFormRef.value;
+}
+async function handleSave() {
+  const arr = [];
+  for (let node of treeDataPerm.value) {
+    traverseTree(node, arr);
+  }
+  await updateAbpPermissions(permissionQuery, { permissions: arr });
+}
 
 onMounted(async () => {
   await loadTree();
@@ -138,10 +158,12 @@ watch(isSelectAll, val => {
     ? treeRef.value.setCheckedKeys(treePermIds.value)
     : treeRef.value.setCheckedKeys([]);
 });
+
+defineExpose({ getRef, handleSave });
 </script>
 
 <template>
-  <el-card shadow="never">
+  <el-card ref="ruleFormRef" shadow="never" :model="newFormInline" class="mb-2">
     <div class="flex flex-wrap">
       <el-input
         v-model="treeSearchValue"
@@ -150,12 +172,14 @@ watch(isSelectAll, val => {
         clearable
         @input="onQueryChanged"
       />
-      <div class="flex items-center ml-auto space-x-4 mb-1">
+
+      <div class="flex items-center ml-auto space-x-4 mb-1 mr-2">
         <el-checkbox v-model="isExpandAll" label="展开/折叠" />
         <el-checkbox v-model="isSelectAll" label="全选/全不选" />
         <el-checkbox v-model="isLinkage" label="父子联动" />
       </div>
     </div>
+
     <div class="flex">
       <!-- 左侧的 Tab -->
       <div class="tab-container">
@@ -190,7 +214,7 @@ watch(isSelectAll, val => {
 
 <style scoped lang="scss">
 .tab-container {
-  height: 520px;
+  height: 500px;
   overflow: auto;
 }
 .tree-container {
