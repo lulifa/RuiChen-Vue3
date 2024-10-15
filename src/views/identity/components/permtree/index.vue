@@ -25,7 +25,7 @@ const treeProps = {
 };
 const permissionQuery: PermissionProvider = {
   providerKey: "",
-  providerName: "R"
+  providerName: newFormInline.value.providerName
 };
 const ruleFormRef = ref();
 const treeRef = ref();
@@ -45,6 +45,8 @@ const tabClick = tab => {
 function tabCore(name: string) {
   activeTab.value = name;
   treeRef.value!.filter(name);
+  isExpandAll.value = false;
+  treeRef.value.setExpandedKeys([]);
 }
 const onQueryChanged = (query: string) => {
   treeRef.value!.filter(query);
@@ -112,7 +114,11 @@ function traverseTree(node, arr) {
   }
 }
 const loadTree = async () => {
-  permissionQuery.providerKey = newFormInline.value.curRow?.name;
+  if (permissionQuery.providerName === "R") {
+    permissionQuery.providerKey = newFormInline.value.curRow?.name;
+  } else if (permissionQuery.providerName === "U") {
+    permissionQuery.providerKey = newFormInline.value.curRow?.id;
+  }
   const data = await getAbpPermissions(permissionQuery);
   const nodes = genePermissionTreeRoot(data.groups);
 

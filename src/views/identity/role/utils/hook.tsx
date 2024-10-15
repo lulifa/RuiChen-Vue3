@@ -1,5 +1,5 @@
 import editForm from "../form.vue";
-import editformpermission from "@/views/identity/components/permtree/role/index.vue";
+import editformpermission from "@/views/identity/components/permtree/index.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
 import { transformI18n } from "@/plugins/i18n";
@@ -257,6 +257,7 @@ export function useRole(treeRef: Ref) {
       title: `角色权限-${row?.name}`,
       props: {
         formInline: {
+          providerName: "R",
           curRow: row
         }
       },
