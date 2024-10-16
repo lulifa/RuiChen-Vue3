@@ -48,31 +48,7 @@ export default {
       component: () => import("@/views/identity/organizationunit/index.vue"),
       meta: {
         icon: "ri:git-branch-line",
-        title: "部门管理",
-        showParent: true,
-        roles: ["admin"]
-      }
-    },
-    {
-      path: "/system/organizationunit/pages/user/index",
-      name: "SystemOrganizationUnitUser",
-      component: () =>
-        import("@/views/identity/organizationunit/pages/user/index.vue"),
-      meta: {
-        icon: "ri:git-branch-line",
-        title: "部门用户",
-        showParent: true,
-        roles: ["admin"]
-      }
-    },
-    {
-      path: "/system/organizationunit/pages/role/index",
-      name: "SystemOrganizationUnitRole",
-      component: () =>
-        import("@/views/identity/organizationunit/pages/role/index.vue"),
-      meta: {
-        icon: "ri:git-branch-line",
-        title: "部门角色",
+        title: "组织机构",
         showParent: true,
         roles: ["admin"]
       }
