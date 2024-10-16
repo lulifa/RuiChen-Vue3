@@ -1,5 +1,6 @@
 export default {
   path: "/system",
+  redirect: "/system/role/index",
   meta: {
     icon: "ri:settings-3-line",
     title: "系统管理",
@@ -12,6 +13,7 @@ export default {
       component: () => import("@/views/identity/role/index.vue"),
       meta: {
         icon: "ri:admin-line",
+        extraIcon: "IF-pure-iconfont-new svg",
         title: "角色管理",
         showParent: true,
         roles: ["admin"]
