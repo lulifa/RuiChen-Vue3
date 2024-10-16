@@ -24,7 +24,7 @@ export default {
       name: "SystemRole",
       component: () => import("@/views/identity/role/index.vue"),
       meta: {
-        icon: "ri:admin-line",
+        icon: "ri:admin-fill",
         extraIcon: "IF-pure-iconfont-new svg",
         title: "角色管理",
         showParent: true,
