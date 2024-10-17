@@ -174,11 +174,11 @@ export const useUserStore = defineStore({
     },
     async getUserInfoAction(): Promise<GetUserInfoModel> {
       const userInfo = await getUserInfoApi();
-      debugger;
+
       // 获取abpStore 初始化abp相关代码
       const abpStore = useAbpStoreWithOut();
       let currentUser = abpStore.getApplication.currentUser;
-      console.log(abpStore.getApplication.auth.grantedPolicies);
+
       //  避免多次请求接口
       if (userInfo?.sub !== currentUser.id) {
         await abpStore.initlizeAbpApplication();
@@ -189,8 +189,7 @@ export const useUserStore = defineStore({
         // 从 currentuser 接口获取
         userId: currentUser.id,
         username: currentUser.userName,
-        roles: ["admin"],
-        // roles: currentUser.roles,
+        roles: currentUser.roles,
         // 从 userinfo 端点获取
         realName: userInfo?.nickname,
         phoneNumber: userInfo?.phone_number,
@@ -199,6 +198,7 @@ export const useUserStore = defineStore({
         emailConfirmed: userInfo?.email_verified === "True"
       };
       if (userInfo?.avatarUrl) {
+        // TODO 文件存储相关逻辑
         // outgoingUserInfo.avatar = formatUrl(userInfo.avatarUrl);
         outgoingUserInfo.avatar = userInfo.avatarUrl;
       }
