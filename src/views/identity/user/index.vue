@@ -50,7 +50,12 @@ const {
   <div :class="['flex', 'justify-between', deviceDetection() && 'flex-wrap']">
     <tree
       ref="treeRef"
-      :class="['mr-2', deviceDetection() ? 'w-full' : 'min-w-[200px]']"
+      style="height: auto"
+      :class="[
+        'mr-2',
+        deviceDetection() ? 'w-full' : 'min-w-[200px]',
+        'h-auto'
+      ]"
       :treeData="treeData"
       :treeLoading="treeLoading"
       @tree-select="onTreeSelect"
