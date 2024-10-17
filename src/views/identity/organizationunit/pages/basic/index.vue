@@ -9,6 +9,7 @@ import EditPen from "@iconify-icons/ep/edit-pen";
 import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 import More from "@iconify-icons/ep/more-filled";
+import Menu from "@iconify-icons/ep/menu";
 
 defineOptions({
   name: "SystemDept"
@@ -25,6 +26,7 @@ const {
   onSearch,
   resetForm,
   openDialog,
+  handlePermission,
   handleDelete,
   handleSelectionChange
 } = useDept();
@@ -140,6 +142,17 @@ function onFullscreen() {
                 <el-dropdown-menu>
                   <el-dropdown-item>
                     <el-button
+                      link
+                      type="primary"
+                      :size="size"
+                      :icon="useRenderIcon(Menu)"
+                      @click="handlePermission(row, 'drawer1')"
+                    >
+                      操作权限
+                    </el-button>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <el-button
                       :class="buttonClass"
                       link
                       type="primary"
@@ -147,7 +160,7 @@ function onFullscreen() {
                       :icon="useRenderIcon(AddFill)"
                       @click="openDialog('新增', { parentId: row.id } as any)"
                     >
-                      子机构
+                      组织机构
                     </el-button>
                   </el-dropdown-item>
                 </el-dropdown-menu>

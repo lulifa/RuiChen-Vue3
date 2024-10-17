@@ -151,7 +151,7 @@ const {
                       :icon="useRenderIcon(Menu)"
                       @click="handlePermission(row, 'drawer')"
                     >
-                      角色权限
+                      操作权限
                     </el-button>
                   </el-dropdown-item>
                 </el-dropdown-menu>

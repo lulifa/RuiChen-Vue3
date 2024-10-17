@@ -124,6 +124,8 @@ const loadTree = async () => {
     permissionQuery.providerKey = newFormInline.value.curRow?.name;
   } else if (permissionQuery.providerName === "U") {
     permissionQuery.providerKey = newFormInline.value.curRow?.id;
+  } else if (permissionQuery.providerName === "O") {
+    permissionQuery.providerKey = newFormInline.value.curRow?.id;
   }
   const data = await getAbpPermissions(permissionQuery);
   const nodes = genePermissionTreeRoot(data.groups);

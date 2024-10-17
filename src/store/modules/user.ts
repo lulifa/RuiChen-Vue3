@@ -174,9 +174,11 @@ export const useUserStore = defineStore({
     },
     async getUserInfoAction(): Promise<GetUserInfoModel> {
       const userInfo = await getUserInfoApi();
+      debugger;
       // 获取abpStore 初始化abp相关代码
       const abpStore = useAbpStoreWithOut();
       let currentUser = abpStore.getApplication.currentUser;
+      console.log(abpStore.getApplication.auth.grantedPolicies);
       //  避免多次请求接口
       if (userInfo?.sub !== currentUser.id) {
         await abpStore.initlizeAbpApplication();

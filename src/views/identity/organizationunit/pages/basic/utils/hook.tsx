@@ -1,8 +1,10 @@
 import dayjs from "dayjs";
 import editForm from "../form.vue";
+import editformpermission from "@/views/identity/components/permtree/index.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
+import { addDrawer } from "@/components/ReDrawer";
 import { reactive, ref, onMounted, h, toRaw, computed } from "vue";
 import type { FormProps, FormItemProps } from "./types";
 import { cloneDeep, deviceDetection } from "@pureadmin/utils";
@@ -161,6 +163,52 @@ export function useDept() {
     return props;
   }
 
+  /** 权限 抽屉和弹出框两种模式 */
+  async function handlePermission(row?: any, type = "dialog") {
+    if (type == "drawer") {
+      addDrawer({
+        title: `权限-${row?.name}`,
+        size: "40%",
+        props: {
+          formInline: {
+            providerName: "O",
+            curRow: row
+          }
+        },
+        closeOnClickModal: false,
+        contentRenderer: () => h(editformpermission, { ref: formRef }),
+        beforeSure: (done, { options }) => {
+          const curData = options.props.formInline as FormItemProps;
+          console.log(curData);
+          formRef.value.handleSave();
+          done(); // 关闭弹框
+          onSearch(); // 刷新表格数据
+        }
+      });
+    } else {
+      addDialog({
+        title: `权限-${row?.name}`,
+        width: "40%",
+        props: {
+          formInline: {
+            providerName: "O",
+            curRow: row
+          }
+        },
+        closeOnClickModal: false,
+        fullscreen: deviceDetection(),
+        contentRenderer: () => h(editformpermission, { ref: formRef }),
+        beforeSure: (done, { options }) => {
+          const curData = options.props.formInline as FormItemProps;
+          console.log(curData);
+          formRef.value.handleSave();
+          done(); // 关闭弹框
+          onSearch(); // 刷新表格数据
+        }
+      });
+    }
+  }
+
   async function handleDelete(row) {
     await deleteById(row?.id);
     message(`您删除了部门名称为${row.name}的这条数据`, { type: "success" });
@@ -183,6 +231,7 @@ export function useDept() {
     resetForm,
     /** 新增、修改部门 */
     openDialog,
+    handlePermission,
     /** 删除部门 */
     handleDelete,
     handleSelectionChange
