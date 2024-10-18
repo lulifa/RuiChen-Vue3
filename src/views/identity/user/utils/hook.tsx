@@ -64,16 +64,16 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       prop: "userName",
       minWidth: 150
     },
-    {
-      label: "姓氏",
-      prop: "surname",
-      minWidth: 90
-    },
-    {
-      label: "名称",
-      prop: "name",
-      minWidth: 90
-    },
+    // {
+    //   label: "姓氏",
+    //   prop: "surname",
+    //   minWidth: 90
+    // },
+    // {
+    //   label: "名称",
+    //   prop: "name",
+    //   minWidth: 90
+    // },
     {
       label: "电子邮箱",
       prop: "email",
