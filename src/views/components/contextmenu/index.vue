@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-import { ContextMenuItem } from "./types";
+import { ContextMenuItemModel } from "./types";
 import "v-contextmenu/dist/themes/default.css";
 
 import {
@@ -50,13 +50,13 @@ import {
 // Props
 const props = defineProps<{
   title: string;
-  menuItems: ContextMenuItem[];
+  menuItems: ContextMenuItemModel[];
 }>();
 
 const contextmenu = ref(null);
 
 // 默认的菜单项
-const defaultMenuItems = ref<ContextMenuItem[]>([
+const defaultMenuItems = ref<ContextMenuItemModel[]>([
   {
     label: `编辑${props.title}`,
     icon: "ep:edit-pen",

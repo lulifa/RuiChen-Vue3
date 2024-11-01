@@ -1,4 +1,4 @@
-interface ContextMenuItem {
+interface ContextMenuItemModel {
   // 标题
   label: string;
   //图标
@@ -12,7 +12,7 @@ interface ContextMenuItem {
   //分割线
   divider?: boolean;
   //子集
-  children?: ContextMenuItem[];
+  children?: ContextMenuItemModel[];
 }
 
-export type { ContextMenuItem };
+export type { ContextMenuItemModel };
