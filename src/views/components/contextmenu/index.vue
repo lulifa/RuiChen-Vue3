@@ -179,7 +179,7 @@ export default defineComponent({
   background-color: #a5d3f0 !important;
 }
 
-.wrapper {
+:deep(.wrapper) {
   padding-left: 10px;
   display: flex;
   align-items: center;
@@ -187,24 +187,24 @@ export default defineComponent({
 }
 
 /* 增加菜单项之间的上下间距 */
-.v-contextmenu-item {
+:deep(.v-contextmenu-item) {
   padding: 10px 15px; /* 上下各增加10px的间距 */
   margin-bottom: 5px; /* 菜单项之间的额外间距 */
 }
 
-.menu-item-content {
+:deep(.menu-item-content) {
   display: inline-flex;
   align-items: center;
   font-size: 1em; /* 放大字体 */
 }
 
-.menu-item-icon {
+:deep(.menu-item-icon) {
   display: inline-block;
   margin-right: 16px; /* 增大图标和文字之间的间距 */
   font-size: 1em; /* 放大图标 */
 }
 
-.menu-item-label {
+:deep(.menu-item-label) {
   font-weight: 400; /* 使文本稍微加粗，更清晰 */
 }
 </style>
