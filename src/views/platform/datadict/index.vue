@@ -7,7 +7,7 @@ defineOptions({
 </script>
 
 <template>
-  <contextmenu title="字典" />
+  <contextmenu title="字典" :menuItems="[]" />
 </template>
 
 <style lang="scss" scoped></style>
