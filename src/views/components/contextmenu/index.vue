@@ -3,7 +3,6 @@
     <el-tree
       :data="treeData"
       :props="defaultProps"
-      style="margin-top: 20px"
       @node-click="handleNodeClick"
       @node-contextmenu="handleNodeContextMenu"
     >
@@ -40,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { ContextMenuItem } from "./types";
 import "v-contextmenu/dist/themes/default.css";
@@ -112,10 +111,12 @@ export default defineComponent({
     // 定义树形结构数据
     const treeData = ref([
       {
+        id: 1,
         label: "示例节点1",
         children: [{ label: "子节点1-1" }, { label: "子节点1-2" }]
       },
       {
+        id: 2,
         label: "示例节点2",
         children: [{ label: "子节点2-1" }, { label: "子节点2-2" }]
       }
@@ -129,6 +130,7 @@ export default defineComponent({
 
     // 处理节点点击事件
     const handleNodeClick = node => {
+      debugger;
       console.log("点击了节点:", node.label);
       hide();
     };
@@ -173,6 +175,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
+:deep(.el-tree-node.is-current > .el-tree-node__content .wrapper) {
+  background-color: #a5d3f0 !important;
+}
+
 .wrapper {
   padding-left: 10px;
   display: flex;
