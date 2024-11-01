@@ -71,6 +71,7 @@
     "responsive-storage": "^2.2.0",
     "sortablejs": "^1.15.2",
     "typeit": "^8.8.4",
+    "v-contextmenu": "^3.2.0",
     "vue": "^3.4.38",
     "vue-i18n": "^9.14.0",
     "vue-router": "^4.4.3",

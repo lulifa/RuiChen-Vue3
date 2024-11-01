@@ -8,6 +8,18 @@ export default {
   },
   children: [
     {
+      path: "/system/platform/datadict/index",
+      name: "SystemPlatformDataDict",
+      component: () => import("@/views/platform/datadict/index.vue"),
+      meta: {
+        icon: "ep:menu",
+        extraIcon: "IF-pure-iconfont-new svg",
+        title: "数据字典",
+        showParent: true,
+        roles: ["admin"]
+      }
+    },
+    {
       path: "/system/platform/menu/index",
       name: "SystemPlatformMenu",
       component: () => import("@/views/platform/menu/index.vue"),

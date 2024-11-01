@@ -1,3 +1,11 @@
+/*
+ * @Author: lulifa 814570123@qq.com
+ * @Date: 2024-08-30 10:41:30
+ * @LastEditors: lulifa 814570123@qq.com
+ * @LastEditTime: 2024-10-31 11:40:22
+ * @FilePath: \RuiChen-Vue3\build\optimize.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 /**
  * 此文件作用于 `vite.config.ts` 的 `optimizeDeps.include` 依赖预构建配置项
  * 依赖预构建，`vite` 启动时会将下面 include 里的模块，编译成 esm 格式并缓存到 node_modules/.vite 文件夹，页面加载到对应模块时如果浏览器有缓存就读取浏览器缓存，如果没有会读取本地缓存并按需加载
@@ -17,6 +25,7 @@ const include = [
   "cropperjs",
   "pinyin-pro",
   "sortablejs",
+  "v-contextmenu",
   "@vueuse/core",
   "@pureadmin/utils",
   "responsive-storage"
