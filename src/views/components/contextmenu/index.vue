@@ -3,7 +3,6 @@
     <el-tree
       :data="treeData"
       :props="defaultProps"
-      @node-click="handleNodeClick"
       @node-contextmenu="handleNodeContextMenu"
     >
       <template #default="{ data }">
@@ -37,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { ContextMenuItem } from "./types";
 import "v-contextmenu/dist/themes/default.css";
@@ -105,16 +104,12 @@ const defaultProps = {
   label: "label"
 };
 
-// 处理节点点击事件
-const handleNodeClick = node => {
-  console.log("点击了节点:", node.label);
-  hide();
-};
-
 // 处理右键点击事件
 const handleNodeContextMenu = (event, data, node, component) => {
-  console.log("右键点击的事件:", event);
+  console.log("右键点击的时间event：", event);
   console.log("被右键点击的节点数据:", data);
+  console.log("节点对象:", node);
+  console.log("节点组件:", component);
   show({ top: event.clientY, left: event.clientX });
 };
 
@@ -131,6 +126,22 @@ const hide = () => {
     contextmenu.value.hide();
   }
 };
+
+// 添加全局点击事件监听器
+const handleClickOutside = event => {
+  const contextmenuElement = contextmenu.value?.$el; // 获取上下文菜单的 DOM 元素
+  if (contextmenuElement && !contextmenuElement.contains(event.target)) {
+    hide(); // 如果点击的不是上下文菜单，则隐藏菜单
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("mousedown", handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("mousedown", handleClickOutside);
+});
 </script>
 
 <style scoped>
