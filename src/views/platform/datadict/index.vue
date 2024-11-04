@@ -32,6 +32,7 @@ const treeData = [
     :menuItems="[]"
     :treeData="treeData"
     :treeLoading="false"
+    :showContextMenu="true"
   />
 </template>
 

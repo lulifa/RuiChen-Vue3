@@ -37,6 +37,7 @@ const props = defineProps<{
   treeLoading: Boolean;
   treeData: any[];
   title: string;
+  showContextMenu: Boolean;
   menuItems: ContextMenuItemModel[];
 }>();
 
@@ -254,6 +255,7 @@ onBeforeUnmount(() => {
       >
         <template #default="{ node, data }">
           <div
+            :Contextmenu="showContextMenu ? 'contextmenu' : null"
             :class="[
               'rounded',
               'flex',
@@ -273,7 +275,6 @@ onBeforeUnmount(() => {
                 ? 'var(--el-color-primary-light-7)'
                 : 'transparent'
             }"
-            Contextmenu:contextmenu
           >
             <IconifyIconOffline
               :icon="
