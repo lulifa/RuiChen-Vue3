@@ -324,17 +324,6 @@ onBeforeUnmount(() => {
   --el-tree-node-hover-bg-color: transparent;
 }
 
-:deep(.el-tree-node.is-current > .el-tree-node__content .wrapper) {
-  background-color: #a5d3f0 !important;
-}
-
-:deep(.wrapper) {
-  padding-left: 10px;
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
 /* 增加菜单项之间的上下间距 */
 :deep(.v-contextmenu-item) {
   padding: 10px 15px; /* 上下各增加10px的间距 */
