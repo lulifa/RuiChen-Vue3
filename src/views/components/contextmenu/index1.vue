@@ -10,7 +10,7 @@ import {
 } from "vue";
 
 import Dept from "@iconify-icons/ri/git-branch-line";
-// import Reset from "@iconify-icons/ri/restart-line";
+import Reset from "@iconify-icons/ri/restart-line";
 import More2Fill from "@iconify-icons/ri/more-2-fill";
 import OfficeBuilding from "@iconify-icons/ep/office-building";
 import LocationCompany from "@iconify-icons/ep/add-location";
@@ -34,13 +34,22 @@ interface Tree {
   children?: Tree[];
 }
 
-const props = defineProps<{
-  treeLoading: Boolean;
-  treeData: any[];
-  title: string;
-  showContextMenu: Boolean;
-  menuItems: ContextMenuItemModel[];
-}>();
+const props = withDefaults(
+  defineProps<{
+    treeLoading: boolean;
+    treeData: any[];
+    title?: string;
+    showContextMenu?: boolean;
+    menuItems?: ContextMenuItemModel[];
+  }>(),
+  {
+    treeLoading: false,
+    treeData: () => [],
+    title: "",
+    showContextMenu: true,
+    menuItems: () => []
+  }
+);
 
 const emit = defineEmits(["tree-select"]);
 
@@ -99,7 +108,7 @@ function toggleRowExpansionAll(status) {
   }
 }
 
-/** 重置部门树状态（选中状态、搜索框值、树初始化） */
+/** 重置树状态（选中状态、搜索框值、树初始化） */
 function onTreeReset() {
   highlightMap.value = {};
   searchValue.value = "";
@@ -149,7 +158,11 @@ const handleNodeContextMenu = (event, data, node, component) => {
   console.log("被右键点击的节点数据:", data);
   console.log("节点对象:", node);
   console.log("节点组件:", component);
-  show({ top: event.clientY, left: event.clientX });
+  if (props.showContextMenu) {
+    show({ top: event.clientY, left: event.clientX });
+  } else {
+    hide();
+  }
 };
 
 // 显示上下文菜单
@@ -165,12 +178,17 @@ const hide = () => {
     contextmenu.value.hide();
   }
 };
+const handleMenuItemClick = (item: ContextMenuItemModel) => {
+  item.handler();
+  hide();
+};
 
-// 添加全局点击事件监听器
 const handleClickOutside = event => {
-  const contextmenuElement = contextmenu.value?.$el; // 获取上下文菜单的 DOM 元素
-  if (contextmenuElement && !contextmenuElement.contains(event.target)) {
-    hide(); // 如果点击的不是上下文菜单，则隐藏菜单
+  const menu = contextmenu.value?.$el;
+  const isMenuClicked = menu && menu.contains(event.target);
+  const isMenuItemClicked = event.target.closest(".v-contextmenu-item");
+  if (!isMenuClicked && !isMenuItemClicked) {
+    hide();
   }
 };
 
@@ -205,7 +223,7 @@ const getNodeIcon = type => {
         v-model="searchValue"
         class="ml-2"
         size="small"
-        placeholder="请输入部门名称"
+        placeholder="请输入名称"
         clearable
       >
         <template #suffix>
@@ -242,10 +260,21 @@ const getNodeIcon = type => {
                 :class="buttonClass"
                 link
                 type="primary"
-                :icon="useRenderIcon(AddFill)"
+                :icon="useRenderIcon(Reset)"
                 @click="onTreeReset"
               >
                 重置状态
+              </el-button>
+            </el-dropdown-item>
+            <el-dropdown-item>
+              <el-button
+                :class="buttonClass"
+                link
+                type="primary"
+                :icon="useRenderIcon(AddFill)"
+                @click="onTreeReset"
+              >
+                {{ `新增${title}` }}
               </el-button>
             </el-dropdown-item>
           </el-dropdown-menu>
@@ -268,7 +297,7 @@ const getNodeIcon = type => {
       >
         <template #default="{ node, data }">
           <div
-            :Contextmenu="showContextMenu ? 'contextmenu' : null"
+            Contextmenu:contextmenu
             :class="[
               'rounded',
               'flex',
@@ -302,7 +331,8 @@ const getNodeIcon = type => {
           <ContextmenuItem
             v-if="!item.hidden && !item.divider"
             :disabled="item.disabled"
-            @click="item.handler"
+            :hideOnClick="false"
+            @click="handleMenuItemClick(item)"
           >
             <template #default>
               <span class="menu-item-content">

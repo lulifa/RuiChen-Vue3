@@ -27,13 +27,7 @@ const treeData = [
 </script>
 
 <template>
-  <contextmenu
-    title="字典"
-    :menuItems="[]"
-    :treeData="treeData"
-    :treeLoading="false"
-    :showContextMenu="true"
-  />
+  <contextmenu title="字典" :treeData="treeData" :treeLoading="false" />
 </template>
 
 <style lang="scss" scoped></style>
