@@ -235,7 +235,7 @@ const getNodeIcon = type => {
   <div
     v-loading="treeLoading"
     class="h-full bg-bg_color overflow-hidden relative"
-    :style="{ minHeight: `calc(100vh - 175px)` }"
+    :style="{ minHeight: `calc(100vh - 142px)` }"
   >
     <div class="flex items-center h-[34px]">
       <el-input
@@ -290,7 +290,7 @@ const getNodeIcon = type => {
       </el-dropdown>
     </div>
     <el-divider />
-    <el-scrollbar height="calc(90vh - 125px)">
+    <el-scrollbar height="calc(90vh - 105px)">
       <el-tree
         ref="treeRef"
         :data="treeData"
@@ -328,7 +328,7 @@ const getNodeIcon = type => {
             }"
           >
             <IconifyIconOffline :icon="getNodeIcon(data.type)" />
-            <span class="!w-[120px] !truncate" :title="node.label">
+            <span class="!w-[140px] !truncate" :title="node.label">
               {{ node.label }}
             </span>
           </div>
@@ -355,7 +355,6 @@ const getNodeIcon = type => {
         </template>
       </Contextmenu>
     </el-scrollbar>
-    <el-divider />
     <div
       v-if="showContextAdd"
       class="absolute bottom-4 left-1/2 transform -translate-x-1/2"
