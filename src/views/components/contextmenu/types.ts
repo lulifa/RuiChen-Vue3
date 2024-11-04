@@ -11,6 +11,8 @@ interface ContextMenuItemModel {
   handler?: Fn;
   //分割线
   divider?: boolean;
+  //是否新增
+  isAdd?: boolean;
   //子集
   children?: ContextMenuItemModel[];
 }
