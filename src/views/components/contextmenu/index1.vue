@@ -16,6 +16,7 @@ import OfficeBuilding from "@iconify-icons/ep/office-building";
 import LocationCompany from "@iconify-icons/ep/add-location";
 import ExpandIcon from "./svg/expand.svg?component";
 import UnExpandIcon from "./svg/unexpand.svg?component";
+import AddFill from "@iconify-icons/ri/add-circle-line";
 
 import type { ContextMenuItemModel } from "./types";
 import "v-contextmenu/dist/themes/default.css";
@@ -180,6 +181,17 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener("mousedown", handleClickOutside);
 });
+
+const getNodeIcon = type => {
+  switch (type) {
+    case 1:
+      return OfficeBuilding;
+    case 2:
+      return LocationCompany;
+    default:
+      return Dept;
+  }
+};
 </script>
 
 <template>
@@ -199,7 +211,7 @@ onBeforeUnmount(() => {
         <template #suffix>
           <el-icon class="el-input__icon">
             <IconifyIconOffline
-              v-show="searchValue.length === 0"
+              v-show="!searchValue.length"
               icon="ri:search-line"
             />
           </el-icon>
@@ -219,22 +231,23 @@ onBeforeUnmount(() => {
                 link
                 type="primary"
                 :icon="useRenderIcon(isExpand ? ExpandIcon : UnExpandIcon)"
-                @click="toggleRowExpansionAll(isExpand ? false : true)"
+                @click="toggleRowExpansionAll(!isExpand)"
               >
                 {{ isExpand ? "折叠全部" : "展开全部" }}
               </el-button>
             </el-dropdown-item>
-            <!-- <el-dropdown-item>
+
+            <el-dropdown-item>
               <el-button
                 :class="buttonClass"
                 link
                 type="primary"
-                :icon="useRenderIcon(Reset)"
+                :icon="useRenderIcon(AddFill)"
                 @click="onTreeReset"
               >
                 重置状态
               </el-button>
-            </el-dropdown-item> -->
+            </el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -262,10 +275,11 @@ onBeforeUnmount(() => {
               'items-center',
               'select-none',
               'hover:text-primary',
-              searchValue.trim().length > 0 &&
-                node.label.includes(searchValue) &&
-                'text-red-500',
-              highlightMap[node.id]?.highlight ? 'dark:text-primary' : ''
+              {
+                'text-red-500':
+                  searchValue.trim() && node.label.includes(searchValue)
+              },
+              { 'dark:text-primary': highlightMap[node.id]?.highlight }
             ]"
             :style="{
               color: highlightMap[node.id]?.highlight
@@ -276,15 +290,7 @@ onBeforeUnmount(() => {
                 : 'transparent'
             }"
           >
-            <IconifyIconOffline
-              :icon="
-                data.type === 1
-                  ? OfficeBuilding
-                  : data.type === 2
-                    ? LocationCompany
-                    : Dept
-              "
-            />
+            <IconifyIconOffline :icon="getNodeIcon(data.type)" />
             <span class="!w-[120px] !truncate" :title="node.label">
               {{ node.label }}
             </span>
@@ -307,7 +313,6 @@ onBeforeUnmount(() => {
               </span>
             </template>
           </ContextmenuItem>
-
           <ContextmenuDivider v-if="item.divider" />
         </template>
       </Contextmenu>
