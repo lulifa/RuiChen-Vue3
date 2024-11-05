@@ -5,6 +5,7 @@ import { useRoleOrg } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Delete from "@iconify-icons/ep/delete";
+import EditPen from "@iconify-icons/ep/edit-pen";
 import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 
@@ -97,7 +98,12 @@ const {
             table-layout="auto"
             :loading="loading"
             :size="size"
-            :data="dataList"
+            :data="
+              dataList.slice(
+                (pagination.currentPage - 1) * pagination.pageSize,
+                pagination.currentPage * pagination.pageSize
+              )
+            "
             :columns="dynamicColumns"
             :pagination="{ ...pagination, size }"
             :header-cell-style="{
@@ -108,8 +114,18 @@ const {
             @page-current-change="handleCurrentChange"
           >
             <template #operation="{ row }">
+              <el-button
+                class="reset-margin"
+                link
+                type="primary"
+                :size="size"
+                :icon="useRenderIcon(EditPen)"
+                @click="openDialog('修改', row)"
+              >
+                修改
+              </el-button>
               <el-popconfirm
-                :title="`你确定要从组织机构中移除角色${row.name}吗?`"
+                :title="`是否确认删除用户编号为${row.id}的这条数据`"
                 @confirm="handleDelete(row)"
               >
                 <template #reference>
@@ -120,7 +136,7 @@ const {
                     :size="size"
                     :icon="useRenderIcon(Delete)"
                   >
-                    移除
+                    删除
                   </el-button>
                 </template>
               </el-popconfirm>

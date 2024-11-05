@@ -178,11 +178,13 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
 
   function handleSizeChange(val: number) {
     form.maxResultCount = val;
+    pagination.pageSize = val;
     onSearch();
   }
 
   function handleCurrentChange(val: number) {
     form.skipCount = (val - 1) * pagination.pageSize;
+    pagination.currentPage = val;
     onSearch();
   }
 

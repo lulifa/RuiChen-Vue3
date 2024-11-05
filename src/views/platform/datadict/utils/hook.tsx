@@ -41,21 +41,22 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
     {
       label: "名称",
       prop: "name",
-      minWidth: 150
+      width: 180
     },
     {
       label: "显示名称",
-      prop: "displayName"
+      prop: "displayName",
+      width: 180
     },
     {
       label: "说明",
       prop: "description",
-      minWidth: 150
+      showOverflowTooltip: true
     },
     {
       label: "值类型",
       prop: "valueType",
-      minWidth: 150,
+      width: 150,
       formatter: ({ valueType }) => {
         return valueTypeMaps[valueType];
       }
@@ -63,12 +64,15 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
     {
       label: "默认值",
       prop: "defaultValue",
-      minWidth: 150
+      width: 150
     },
     {
       label: "允许空值",
       prop: "allowBeNull",
-      minWidth: 150
+      width: 90,
+      cellRenderer: scope => (
+        <el-switch v-model={scope.row.allowBeNull} disabled />
+      )
     },
     {
       label: "操作",
@@ -85,18 +89,12 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
 
   function handleSizeChange(val: number) {
     form.maxResultCount = val;
-    dataList.value = dataList.value.slice(
-      (pagination.currentPage - 1) * pagination.pageSize,
-      pagination.currentPage * pagination.pageSize
-    );
+    pagination.pageSize = val;
   }
 
   function handleCurrentChange(val: number) {
     form.skipCount = (val - 1) * pagination.pageSize;
-    dataList.value = dataList.value.slice(
-      (pagination.currentPage - 1) * pagination.pageSize,
-      pagination.currentPage * pagination.pageSize
-    );
+    pagination.currentPage = val;
   }
 
   async function onSearch() {
@@ -128,7 +126,8 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
     onSearch();
   }
 
-  function openDialog(title = "选择") {
+  function openDialog(title = "选择", row?) {
+    console.log(row);
     addDialog({
       title: `${title}用户`,
       props: {
