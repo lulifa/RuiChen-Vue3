@@ -8,7 +8,6 @@ import { MenuOperation } from "@/enums/commonEnum";
 import { deviceDetection } from "@pureadmin/utils";
 import { type Ref, h, ref, reactive, onMounted } from "vue";
 import { ElMessageBox } from "element-plus";
-import { removeOrganizationUnit } from "@/api/identity/identity-role";
 import {
   getAll as getAllDatas,
   get as getData,
@@ -16,7 +15,8 @@ import {
   create as createData,
   remove as removeData,
   createItem,
-  updateItem
+  updateItem,
+  removeItem
 } from "@/api/platform/datas";
 import {
   type FormItemProps,
@@ -96,7 +96,7 @@ export function useDataDict(tableRef: Ref, treeRef: Ref) {
   ];
 
   async function handleDelete(row) {
-    await removeOrganizationUnit(row?.id, form.dataId);
+    await removeItem(form.dataId, row?.name);
     onSearch();
   }
 
