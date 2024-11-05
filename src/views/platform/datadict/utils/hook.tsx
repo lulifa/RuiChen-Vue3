@@ -1,20 +1,30 @@
 import "./reset.css";
 import editForm from "../form.vue";
+import editFormTree from "../formTree.vue";
 import { handleTree } from "@/utils/tree";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
-
+import { MenuOperation } from "@/enums/commonEnum";
 import { deviceDetection } from "@pureadmin/utils";
 import { type Ref, h, ref, reactive, onMounted } from "vue";
-
+import { ElMessageBox } from "element-plus";
 import { removeOrganizationUnit } from "@/api/identity/identity-role";
 import { addRoles as addOrgRoles } from "@/api/identity/identity-organizationunit";
 import {
   getAll as getAllDatas,
-  get as getDataItems
+  get as getData,
+  update as updateData,
+  create as createData,
+  remove as removeData
 } from "@/api/platform/datas";
-import { type FormItemProps, valueTypeMaps } from "../utils/types";
+import {
+  type FormItemProps,
+  type FormItemPropsTree,
+  type FormPropsTree,
+  valueTypeMaps
+} from "../utils/types";
 import type { GetRolePagedRequest } from "@/api/identity/identity-role/model";
+import type { ContextMenuItemModel } from "@/views/components/tree/types";
 
 export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
   interface CustomForm extends Partial<GetRolePagedRequest> {
@@ -26,6 +36,7 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
     dataId: ""
   });
   const formRef = ref();
+  const formRefTree = ref();
   const dataList = ref([]);
   const loading = ref(true);
   const higherDeptOptions = ref();
@@ -101,7 +112,7 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
     loading.value = true;
     try {
       if (form.dataId) {
-        const data = await getDataItems(form.dataId);
+        const data = await getData(form.dataId);
         dataList.value = data.items;
         pagination.total = data.items.length;
       } else {
@@ -162,16 +173,132 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
     });
   }
 
-  onMounted(async () => {
-    treeLoading.value = true;
-    onSearch();
+  const menuItemsTree = ref<ContextMenuItemModel[]>([
+    {
+      label: `新增字典`,
+      icon: "ep:plus",
+      isAdd: true,
+      handler: node => {
+        console.log(node);
+        console.log("新增菜单项");
+        openDialogTree(MenuOperation.Add, node);
+      }
+    },
+    {
+      label: `编辑字典`,
+      icon: "ep:edit-pen",
+      handler: node => {
+        console.log(node);
+        console.log("编辑菜单项");
+        openDialogTree(MenuOperation.Update, node);
+      }
+    },
+    {
+      label: `添加子级字典`,
+      icon: "ep:plus",
+      handler: node => {
+        console.log(node);
+        console.log("添加子级菜单项");
+        openDialogTree(MenuOperation.AddChild, node);
+      }
+    },
+    {
+      label: `删除字典`,
+      icon: "ep:delete",
+      handler: node => {
+        console.log(node.value);
+        console.log("删除菜单项");
+        ElMessageBox.confirm(
+          `确认删除${node.value?.name}该项字典 且无法恢复?`
+        ).then(async () => {
+          await removeData(node.value?.id);
+          await loadTree();
+        });
+      }
+    }
+  ]);
 
-    const data = await getAllDatas();
-    const datas = data.items;
-    const options = handleTree(datas, "displayName");
-    higherDeptOptions.value = options;
-    treeData.value = options;
-    treeLoading.value = false;
+  async function openDialogTree(operation, node?) {
+    debugger;
+    let props = await propsFormInlineTree(operation, node);
+    addDialog({
+      title: `${operation}字典`,
+      props: props,
+      width: "40%",
+      draggable: true,
+      fullscreen: deviceDetection(),
+      fullscreenIcon: false,
+      closeOnClickModal: false,
+      contentRenderer: () => h(editFormTree, { ref: formRefTree }),
+      beforeSure: (done, { options }) => {
+        const FormRef = formRefTree.value.getRef();
+        const curData = options.props.formInline as FormItemPropsTree;
+        function chores() {
+          done(); // 关闭弹框
+          onSearch(); // 刷新表格数据
+        }
+        FormRef.validate(async valid => {
+          if (valid) {
+            // 表单规则校验通过
+            if (
+              operation === MenuOperation.Add ||
+              operation === MenuOperation.AddChild
+            ) {
+              await createData(curData);
+            } else if (operation === MenuOperation.Update) {
+              await updateData(curData.id, curData);
+            }
+
+            await loadTree();
+            chores();
+          }
+        });
+      }
+    });
+  }
+
+  async function propsFormInlineTree(operation: MenuOperation, node) {
+    let props: FormPropsTree = {
+      formInline: {
+        id: "",
+        parentId: "",
+        name: "",
+        displayName: "",
+        description: ""
+      }
+    };
+    if (operation == MenuOperation.AddChild) {
+      props.formInline.parentId = node.value?.id;
+    }
+    if (operation == MenuOperation.Update) {
+      const res = await getData(node.value?.id);
+      if (res) {
+        props.formInline.id = res.id;
+        props.formInline.parentId = res.parentId;
+        props.formInline.name = res.name;
+        props.formInline.displayName = res.displayName;
+        props.formInline.description = res.description;
+      }
+    }
+    return props;
+  }
+
+  async function loadTree() {
+    treeLoading.value = true;
+    try {
+      const data = await getAllDatas();
+      const datas = data.items;
+      const options = handleTree(datas, "displayName");
+      higherDeptOptions.value = options;
+      treeData.value = options;
+    } finally {
+      treeLoading.value = false;
+    }
+  }
+
+  onMounted(async () => {
+    await loadTree();
+    onSearch();
   });
 
   return {
@@ -186,6 +313,7 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
     onSearch,
     resetForm,
     openDialog,
+    menuItemsTree,
     onTreeSelect,
     handleDelete,
     handleSizeChange,

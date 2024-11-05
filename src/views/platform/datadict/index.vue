@@ -29,6 +29,7 @@ const {
   onSearch,
   resetForm,
   openDialog,
+  menuItemsTree,
   onTreeSelect,
   handleDelete,
   handleSizeChange,
@@ -44,6 +45,7 @@ const {
       :treeData="treeData"
       :treeLoading="treeLoading"
       title="字典"
+      :menu-items="menuItemsTree"
       @tree-select="onTreeSelect"
     />
     <div

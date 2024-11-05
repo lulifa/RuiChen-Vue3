@@ -47,7 +47,6 @@ export const valueTypeOptions = [
     key: ValueType.Object
   }
 ];
-
 interface FormItemProps {
   id: string;
   selectedIds: Array<any>;
@@ -55,4 +54,16 @@ interface FormItemProps {
 interface FormProps {
   formInline: Partial<FormItemProps>;
 }
-export type { FormItemProps, FormProps };
+
+interface FormItemPropsTree {
+  id: string;
+  parentId: string;
+  name: string;
+  displayName: string;
+  description: string;
+}
+interface FormPropsTree {
+  formInline: Partial<FormItemPropsTree>;
+}
+
+export type { FormItemProps, FormProps, FormItemPropsTree, FormPropsTree };

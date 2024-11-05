@@ -67,7 +67,7 @@ const treeRef = ref();
 const isExpand = ref(true);
 const searchValue = ref("");
 const highlightMap = ref({});
-
+const selectedNode = ref(null);
 const defaultProps = {
   children: "children",
   label: "name"
@@ -131,28 +131,32 @@ const defaultMenuItems = ref<ContextMenuItemModel[]>([
     label: `新增${props.title}`,
     icon: "ep:plus",
     isAdd: true,
-    handler: () => {
+    handler: node => {
+      console.log(node);
       console.log("新增菜单项");
     }
   },
   {
     label: `编辑${props.title}`,
     icon: "ep:edit-pen",
-    handler: () => {
+    handler: node => {
+      console.log(node);
       console.log("编辑菜单项");
     }
   },
   {
     label: `添加子级${props.title}`,
     icon: "ep:plus",
-    handler: () => {
+    handler: node => {
+      console.log(node);
       console.log("添加子级菜单项");
     }
   },
   {
     label: `删除${props.title}`,
     icon: "ep:delete",
-    handler: () => {
+    handler: node => {
+      console.log(node);
       console.log("删除菜单项");
     }
   }
@@ -177,6 +181,7 @@ const handleNodeContextMenu = (event, data, node, component) => {
   console.log("被右键点击的节点数据:", data);
   console.log("节点对象:", node);
   console.log("节点组件:", component);
+  selectedNode.value = data;
   if (props.showContextMenu) {
     show({ top: event.clientY, left: event.clientX });
   } else {
@@ -198,7 +203,7 @@ const hide = () => {
   }
 };
 const handleMenuItemClick = (item: ContextMenuItemModel) => {
-  item.handler();
+  item.handler(selectedNode);
   hide();
 };
 
