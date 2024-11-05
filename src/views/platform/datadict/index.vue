@@ -1,21 +1,26 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import tree from "@/views/components/tree/index.vue";
-import { useRoleOrg } from "./utils/hook";
+import { MenuOperation } from "@/enums/commonEnum";
+import { useDataDict } from "./utils/hook";
 import { PureTableBar } from "@/components/RePureTableBar";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Delete from "@iconify-icons/ep/delete";
 import EditPen from "@iconify-icons/ep/edit-pen";
-import Refresh from "@iconify-icons/ep/refresh";
 import AddFill from "@iconify-icons/ri/add-circle-line";
 
 defineOptions({
-  name: "SystemRole"
+  name: "SystemDataDict"
 });
 
 const treeRef = ref();
-const formRef = ref();
 const tableRef = ref();
+const dataListFilter = computed(() => {
+  return dataList.value.slice(
+    (pagination.currentPage - 1) * pagination.pageSize,
+    pagination.currentPage * pagination.pageSize
+  );
+});
 
 const {
   form,
@@ -27,14 +32,13 @@ const {
   pagination,
   deviceDetection,
   onSearch,
-  resetForm,
   openDialog,
   menuItemsTree,
   onTreeSelect,
   handleDelete,
   handleSizeChange,
   handleCurrentChange
-} = useRoleOrg(tableRef, treeRef);
+} = useDataDict(tableRef, treeRef);
 </script>
 
 <template>
@@ -56,28 +60,8 @@ const {
         :inline="true"
         :model="form"
         class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px] overflow-auto"
-      >
-        <el-form-item label="高级搜索：" style="width: 80%">
-          <el-input
-            v-model="form.filter"
-            placeholder="请输入搜索内容"
-            clearable
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            :icon="useRenderIcon('ri:search-line')"
-            :loading="loading"
-            @click="onSearch"
-          >
-            搜索
-          </el-button>
-          <el-button :icon="useRenderIcon(Refresh)" @click="resetForm(formRef)">
-            重置
-          </el-button>
-        </el-form-item>
-      </el-form>
+        ><el-form-item label=""
+      /></el-form>
 
       <PureTableBar title="" :columns="columns" @refresh="onSearch">
         <template #buttons>
@@ -85,9 +69,9 @@ const {
             type="primary"
             :disabled="!form.dataId"
             :icon="useRenderIcon(AddFill)"
-            @click="openDialog()"
+            @click="openDialog(MenuOperation.Add)"
           >
-            添加角色
+            添加元素
           </el-button>
         </template>
         <template v-slot="{ size, dynamicColumns }">
@@ -100,14 +84,9 @@ const {
             table-layout="auto"
             :loading="loading"
             :size="size"
-            :data="
-              dataList.slice(
-                (pagination.currentPage - 1) * pagination.pageSize,
-                pagination.currentPage * pagination.pageSize
-              )
-            "
-            :columns="dynamicColumns"
+            :data="dataListFilter"
             :pagination="{ ...pagination, size }"
+            :columns="dynamicColumns"
             :header-cell-style="{
               background: 'var(--el-fill-color-light)',
               color: 'var(--el-text-color-primary)'
@@ -122,12 +101,12 @@ const {
                 type="primary"
                 :size="size"
                 :icon="useRenderIcon(EditPen)"
-                @click="openDialog('修改', row)"
+                @click="openDialog(MenuOperation.Update, row)"
               >
                 修改
               </el-button>
               <el-popconfirm
-                :title="`是否确认删除用户编号为${row.id}的这条数据`"
+                :title="`是否确认删除元素编号为${row.id}的这条数据`"
                 @confirm="handleDelete(row)"
               >
                 <template #reference>

@@ -9,25 +9,27 @@ import { deviceDetection } from "@pureadmin/utils";
 import { type Ref, h, ref, reactive, onMounted } from "vue";
 import { ElMessageBox } from "element-plus";
 import { removeOrganizationUnit } from "@/api/identity/identity-role";
-import { addRoles as addOrgRoles } from "@/api/identity/identity-organizationunit";
 import {
   getAll as getAllDatas,
   get as getData,
   update as updateData,
   create as createData,
-  remove as removeData
+  remove as removeData,
+  createItem,
+  updateItem
 } from "@/api/platform/datas";
 import {
   type FormItemProps,
+  type FormProps,
   type FormItemPropsTree,
   type FormPropsTree,
   valueTypeMaps
 } from "../utils/types";
-import type { GetRolePagedRequest } from "@/api/identity/identity-role/model";
+import { ValueType, type GetDataByPaged } from "@/api/platform/datas/model";
 import type { ContextMenuItemModel } from "@/views/components/tree/types";
 
-export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
-  interface CustomForm extends Partial<GetRolePagedRequest> {
+export function useDataDict(tableRef: Ref, treeRef: Ref) {
+  interface CustomForm extends Partial<GetDataByPaged> {
     // 添加自定义字段
     dataId: string;
   }
@@ -101,11 +103,13 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
   function handleSizeChange(val: number) {
     form.maxResultCount = val;
     pagination.pageSize = val;
+    onSearch();
   }
 
   function handleCurrentChange(val: number) {
     form.skipCount = (val - 1) * pagination.pageSize;
     pagination.currentPage = val;
+    onSearch();
   }
 
   async function onSearch() {
@@ -137,16 +141,12 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
     onSearch();
   }
 
-  function openDialog(title = "选择", row?) {
-    console.log(row);
+  function openDialog(operation, row?: FormItemProps) {
+    debugger;
+    let props = propsFormInline(operation, row);
     addDialog({
-      title: `${title}用户`,
-      props: {
-        formInline: {
-          id: form.dataId,
-          selectedIds: []
-        }
-      },
+      title: `${operation}元素`,
+      props: props,
       width: "40%",
       draggable: true,
       fullscreen: deviceDetection(),
@@ -163,14 +163,42 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
         FormRef.validate(async valid => {
           if (valid) {
             // 表单规则校验通过
-            if (curData.selectedIds.length > 0) {
-              await addOrgRoles(curData.id, curData.selectedIds);
+            if (operation == MenuOperation.Add) {
+              await createItem(form.dataId, curData);
+            } else {
+              await updateItem(form.dataId, curData.name, curData);
             }
+            onSearch();
             chores();
           }
         });
       }
     });
+  }
+
+  function propsFormInline(operation: MenuOperation, row: FormItemProps) {
+    let props: FormProps = {
+      formInline: {
+        id: "",
+        dataId: form.dataId,
+        name: "",
+        displayName: "",
+        description: "",
+        defaultValue: "",
+        allowBeNull: true,
+        valueType: ValueType.String
+      }
+    };
+    if (operation == MenuOperation.Update) {
+      props.formInline.id = row?.id;
+      props.formInline.name = row?.name;
+      props.formInline.displayName = row?.displayName;
+      props.formInline.description = row?.description;
+      props.formInline.defaultValue = row?.defaultValue;
+      props.formInline.allowBeNull = row?.allowBeNull;
+      props.formInline.valueType = row?.valueType;
+    }
+    return props;
   }
 
   const menuItemsTree = ref<ContextMenuItemModel[]>([

@@ -1,4 +1,8 @@
-import { ValueType } from "@/api/platform/datas/model";
+import {
+  type Data,
+  type DataItem,
+  ValueType
+} from "@/api/platform/datas/model";
 
 export const valueTypeMaps: { [key: number]: string } = {
   [ValueType.String]: "String",
@@ -47,21 +51,14 @@ export const valueTypeOptions = [
     key: ValueType.Object
   }
 ];
-interface FormItemProps {
-  id: string;
-  selectedIds: Array<any>;
+interface FormItemProps extends DataItem {
+  dataId: string;
 }
 interface FormProps {
   formInline: Partial<FormItemProps>;
 }
 
-interface FormItemPropsTree {
-  id: string;
-  parentId: string;
-  name: string;
-  displayName: string;
-  description: string;
-}
+interface FormItemPropsTree extends Data {}
 interface FormPropsTree {
   formInline: Partial<FormItemPropsTree>;
 }
