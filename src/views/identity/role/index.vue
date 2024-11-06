@@ -27,6 +27,7 @@ const {
   columns,
   dataList,
   pagination,
+  buttonClass,
   onSearch,
   resetForm,
   openDialog,
@@ -145,6 +146,7 @@ const {
                 <el-dropdown-menu>
                   <el-dropdown-item>
                     <el-button
+                      :class="buttonClass"
                       link
                       type="primary"
                       :size="size"

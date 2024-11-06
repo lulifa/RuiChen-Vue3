@@ -9,8 +9,6 @@ import { addDialog } from "@/components/ReDialog";
 import { addDrawer } from "@/components/ReDrawer";
 import type { PaginationProps } from "@pureadmin/table";
 import ReCropperPreview from "@/components/ReCropperPreview";
-import Check from "@iconify-icons/ep/check";
-import Close from "@iconify-icons/ep/close";
 
 import type { FormProps, FormItemProps } from "../utils/types";
 import {
@@ -20,7 +18,16 @@ import {
   hideTextAtIndex
 } from "@pureadmin/utils";
 import { ElForm, ElInput, ElFormItem, ElProgress } from "element-plus";
-import { type Ref, h, ref, toRaw, watch, reactive, onMounted } from "vue";
+import {
+  type Ref,
+  h,
+  ref,
+  toRaw,
+  watch,
+  reactive,
+  onMounted,
+  computed
+} from "vue";
 
 import {
   getAssignableRoles,
@@ -45,7 +52,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const formRef = ref();
   const ruleFormRef = ref();
   const dataList = ref([]);
-  const loading = ref(true);
+  const loading = ref(false);
   // 上传头像信息
   const avatarInfo = ref();
   const higherDeptOptions = ref();
@@ -62,86 +69,62 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "用户名",
       prop: "userName",
-      minWidth: 150
+      width: 180
     },
-    // {
-    //   label: "姓氏",
-    //   prop: "surname",
-    //   minWidth: 90
-    // },
-    // {
-    //   label: "名称",
-    //   prop: "name",
-    //   minWidth: 90
-    // },
     {
       label: "电子邮箱",
       prop: "email",
       headerAlign: "center",
-      align: "left",
-      width: 240,
-      cellRenderer: ({ row, props }) => (
-        <div style="white-space: nowrap;">
-          <el-tag
-            size={props.size}
-            type={row.emailConfirmed ? "success" : null}
-          >
-            {row.emailConfirmed ? "已确认" : "未确认"}
-          </el-tag>
-          <span style="margin-left:20px;">{row.email}</span>
-        </div>
-      )
+      width: 280,
+      cellRenderer: ({ row, props }) => {
+        if (row.email) {
+          return (
+            <div style="white-space: nowrap;">
+              <span style="margin-left:20px;">{row.email}</span>
+              <el-tag
+                size={props.size}
+                type={row.emailConfirmed ? "success" : null}
+              >
+                {row.emailConfirmed ? "已确认" : "未确认"}
+              </el-tag>
+            </div>
+          );
+        }
+      }
     },
     {
       label: "电话号码",
       prop: "phoneNumber",
       headerAlign: "center",
-      align: "left",
-      width: 240,
-      cellRenderer: ({ row, props }) => (
-        <div style="white-space: nowrap;">
-          <el-tag
-            size={props.size}
-            type={row.phoneNumberConfirmed ? "success" : null}
-          >
-            {row.phoneNumberConfirmed ? "已确认" : "未确认"}
-          </el-tag>
-          <span style="margin-left:20px;">
-            {hideTextAtIndex(row.phoneNumber, { start: 3, end: 6 })}
-          </span>
-        </div>
-      )
+      width: 280,
+      cellRenderer: ({ row, props }) => {
+        if (row.phoneNumber) {
+          return (
+            <div style="white-space: nowrap;">
+              <span style="margin-left:20px;">
+                {hideTextAtIndex(row.phoneNumber, { start: 3, end: 6 })}
+              </span>
+              <el-tag
+                size={props.size}
+                type={row.phoneNumberConfirmed ? "success" : null}
+              >
+                {row.phoneNumberConfirmed ? "已确认" : "未确认"}
+              </el-tag>
+            </div>
+          );
+        }
+      }
     },
     {
       label: "启用",
       prop: "isActive",
-      width: 90,
-      cellRenderer: scope => (
-        <div class="flex justify-center w-full">
-          <iconifyIconOffline
-            icon={scope.row.isActive ? Check : Close}
-            style={{
-              color: scope.row.isActive ? "#13ce66" : "#ff4949",
-              fontSize: "20px"
-            }}
-          />
-        </div>
-      )
+      cellRenderer: scope => <el-switch v-model={scope.row.isActive} disabled />
     },
     {
       label: "账户锁定",
       prop: "lockoutEnabled",
-      width: 100,
       cellRenderer: scope => (
-        <div class="flex justify-center w-full">
-          <iconifyIconOffline
-            icon={scope.row.lockoutEnabled ? Check : Close}
-            style={{
-              color: scope.row.lockoutEnabled ? "#13ce66" : "#ff4949",
-              fontSize: "20px"
-            }}
-          />
-        </div>
+        <el-switch v-model={scope.row.lockoutEnabled} disabled />
       )
     },
     {
@@ -151,6 +134,16 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       slot: "operation"
     }
   ];
+
+  const buttonClass = computed(() => {
+    return [
+      "!h-[20px]",
+      "reset-margin",
+      "!text-gray-500",
+      "dark:!text-white",
+      "dark:hover:!text-primary"
+    ];
+  });
 
   // 重置的新密码
   const pwdForm = reactive({
@@ -217,9 +210,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   async function onSearch() {
     loading.value = true;
     try {
-      const data = await getListAdvanced(toRaw(form));
-      dataList.value = data.items;
-      pagination.total = data.totalCount;
+      if (form.organizationUnitId) {
+        const data = await getListAdvanced(toRaw(form));
+        dataList.value = data.items;
+        pagination.total = data.totalCount;
+      } else {
+        dataList.value = [];
+        pagination.total = 0;
+      }
     } finally {
       loading.value = false;
     }
@@ -505,17 +503,22 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     });
   }
 
-  onMounted(async () => {
+  async function loadTree() {
     treeLoading.value = true;
-    onSearch();
+    try {
+      // 归属部门
+      const data = await getAllOrganizationUnits();
+      const organizationunits = data.items;
+      const options = handleTree(organizationunits, "displayName");
+      higherDeptOptions.value = options;
+      treeData.value = options;
+    } finally {
+      treeLoading.value = false;
+    }
+  }
 
-    // 归属部门
-    const data = await getAllOrganizationUnits();
-    const organizationunits = data.items;
-    const options = handleTree(organizationunits, "displayName");
-    higherDeptOptions.value = options;
-    treeData.value = options;
-    treeLoading.value = false;
+  onMounted(async () => {
+    await loadTree();
   });
 
   return {
@@ -527,6 +530,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     treeLoading,
     selectedNum,
     pagination,
+    buttonClass,
     deviceDetection,
     onSearch,
     resetForm,

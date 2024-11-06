@@ -6,7 +6,7 @@ import { addDialog } from "@/components/ReDialog";
 import { addDrawer } from "@/components/ReDrawer";
 import type { PaginationProps } from "@pureadmin/table";
 import { deviceDetection } from "@pureadmin/utils";
-import { reactive, ref, onMounted, h, toRaw } from "vue";
+import { reactive, ref, onMounted, h, toRaw, computed } from "vue";
 import type { FormProps, FormItemProps } from "../utils/types";
 import {
   create,
@@ -69,6 +69,15 @@ export function useRole() {
       slot: "operation"
     }
   ];
+  const buttonClass = computed(() => {
+    return [
+      "!h-[20px]",
+      "reset-margin",
+      "!text-gray-500",
+      "dark:!text-white",
+      "dark:hover:!text-primary"
+    ];
+  });
 
   async function handleDelete(row) {
     await deleteById(row?.id);
@@ -231,6 +240,7 @@ export function useRole() {
     columns,
     dataList,
     pagination,
+    buttonClass,
     onSearch,
     resetForm,
     openDialog,
