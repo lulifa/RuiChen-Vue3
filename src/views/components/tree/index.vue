@@ -56,8 +56,8 @@ const props = withDefaults(
     treeLoading: false,
     treeData: () => [],
     title: "",
-    showContextMenu: true,
-    showContextAdd: true,
+    showContextMenu: false,
+    showContextAdd: false,
     menuItems: () => []
   }
 );

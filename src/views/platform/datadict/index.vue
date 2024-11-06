@@ -49,6 +49,8 @@ const {
       :treeData="treeData"
       :treeLoading="treeLoading"
       title="字典"
+      :show-context-menu="true"
+      :show-context-add="true"
       :menu-items="menuItemsTree"
       @tree-select="onTreeSelect"
     />
