@@ -382,6 +382,7 @@ const getNodeIcon = type => {
 
 :deep(.el-tree) {
   --el-tree-node-hover-bg-color: transparent;
+  margin-top: 10px;
 }
 
 /* 增加菜单项之间的上下间距 */
