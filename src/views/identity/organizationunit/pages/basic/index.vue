@@ -142,6 +142,7 @@ function onFullscreen() {
                 <el-dropdown-menu>
                   <el-dropdown-item>
                     <el-button
+                      :class="buttonClass"
                       link
                       type="primary"
                       :size="size"
