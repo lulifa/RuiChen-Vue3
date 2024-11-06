@@ -4,14 +4,14 @@ import { setupStore } from "@/store";
 import { useI18n } from "@/plugins/i18n";
 import { getPlatformConfig } from "./config";
 import { MotionPlugin } from "@vueuse/motion";
-// import { useEcharts } from "@/plugins/echarts";
+import { useEcharts } from "@/plugins/echarts";
 import { createApp, type Directive } from "vue";
 import { useElementPlus } from "@/plugins/elementPlus";
 import { injectResponsiveStorage } from "@/utils/responsive";
 import { useAbpStore } from "@/store/modules/abp";
 
 import Table from "@pureadmin/table";
-// import PureDescriptions from "@pureadmin/descriptions";
+import PureDescriptions from "@pureadmin/descriptions";
 
 // 引入重置样式
 import "./style/reset.scss";
@@ -64,8 +64,12 @@ getPlatformConfig(app).then(async config => {
   await useAbpStore().initlizeAbpApplication();
   await useAbpStore().initlizaAbpApiDefinition();
 
-  app.use(MotionPlugin).use(useI18n).use(useElementPlus).use(Table);
-  // .use(PureDescriptions)
-  // .use(useEcharts);
+  app
+    .use(MotionPlugin)
+    .use(useI18n)
+    .use(useElementPlus)
+    .use(Table)
+    .use(PureDescriptions)
+    .use(useEcharts);
   app.mount("#app");
 });
