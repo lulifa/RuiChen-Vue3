@@ -80,13 +80,13 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         if (row.email) {
           return (
             <div style="white-space: nowrap;">
-              <span style="margin-left:20px;">{row.email}</span>
               <el-tag
                 size={props.size}
                 type={row.emailConfirmed ? "success" : null}
               >
                 {row.emailConfirmed ? "已确认" : "未确认"}
               </el-tag>
+              <span style="margin-left:10px;">{row.email}</span>
             </div>
           );
         }
@@ -101,15 +101,15 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         if (row.phoneNumber) {
           return (
             <div style="white-space: nowrap;">
-              <span style="margin-left:20px;">
-                {hideTextAtIndex(row.phoneNumber, { start: 3, end: 6 })}
-              </span>
               <el-tag
                 size={props.size}
                 type={row.phoneNumberConfirmed ? "success" : null}
               >
                 {row.phoneNumberConfirmed ? "已确认" : "未确认"}
               </el-tag>
+              <span style="margin-left:10px;">
+                {hideTextAtIndex(row.phoneNumber, { start: 3, end: 6 })}
+              </span>
             </div>
           );
         }

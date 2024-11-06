@@ -3,8 +3,6 @@ import editForm from "../form.vue";
 import { handleTree } from "@/utils/tree";
 import { addDialog } from "@/components/ReDialog";
 import type { PaginationProps } from "@pureadmin/table";
-import Check from "@iconify-icons/ep/check";
-import Close from "@iconify-icons/ep/close";
 import { hideTextAtIndex, deviceDetection } from "@pureadmin/utils";
 import { type Ref, h, ref, toRaw, reactive, onMounted } from "vue";
 
@@ -42,92 +40,68 @@ export function useUserOrg(tableRef: Ref, treeRef: Ref) {
     {
       label: "用户名",
       prop: "userName",
-      minWidth: 150
-    },
-    {
-      label: "姓氏",
-      prop: "surname",
-      minWidth: 90
-    },
-    {
-      label: "名称",
-      prop: "name",
-      minWidth: 90
+      width: 180
     },
     {
       label: "电子邮箱",
       prop: "email",
       headerAlign: "center",
-      align: "left",
-      width: 240,
-      cellRenderer: ({ row, props }) => (
-        <div style="white-space: nowrap;">
-          <el-tag
-            size={props.size}
-            type={row.emailConfirmed ? "success" : null}
-          >
-            {row.emailConfirmed ? "已确认" : "未确认"}
-          </el-tag>
-          <span style="margin-left:20px;">{row.email}</span>
-        </div>
-      )
+      width: 280,
+      cellRenderer: ({ row, props }) => {
+        if (row.email) {
+          return (
+            <div style="white-space: nowrap;">
+              <el-tag
+                size={props.size}
+                type={row.emailConfirmed ? "success" : null}
+              >
+                {row.emailConfirmed ? "已确认" : "未确认"}
+              </el-tag>
+              <span style="margin-left:10px;">{row.email}</span>
+            </div>
+          );
+        }
+      }
     },
     {
       label: "电话号码",
       prop: "phoneNumber",
       headerAlign: "center",
-      align: "left",
-      width: 240,
-      cellRenderer: ({ row, props }) => (
-        <div style="white-space: nowrap;">
-          <el-tag
-            size={props.size}
-            type={row.phoneNumberConfirmed ? "success" : null}
-          >
-            {row.phoneNumberConfirmed ? "已确认" : "未确认"}
-          </el-tag>
-          <span style="margin-left:20px;">
-            {hideTextAtIndex(row.phoneNumber, { start: 3, end: 6 })}
-          </span>
-        </div>
-      )
+      width: 280,
+      cellRenderer: ({ row, props }) => {
+        if (row.phoneNumber) {
+          return (
+            <div style="white-space: nowrap;">
+              <el-tag
+                size={props.size}
+                type={row.phoneNumberConfirmed ? "success" : null}
+              >
+                {row.phoneNumberConfirmed ? "已确认" : "未确认"}
+              </el-tag>
+              <span style="margin-left:10px;">
+                {hideTextAtIndex(row.phoneNumber, { start: 3, end: 6 })}
+              </span>
+            </div>
+          );
+        }
+      }
     },
     {
       label: "启用",
       prop: "isActive",
-      width: 90,
-      cellRenderer: scope => (
-        <div class="flex justify-center w-full">
-          <iconifyIconOffline
-            icon={scope.row.isActive ? Check : Close}
-            style={{
-              color: scope.row.isActive ? "#13ce66" : "#ff4949",
-              fontSize: "20px"
-            }}
-          />
-        </div>
-      )
+      cellRenderer: scope => <el-switch v-model={scope.row.isActive} disabled />
     },
     {
       label: "账户锁定",
       prop: "lockoutEnabled",
-      width: 100,
       cellRenderer: scope => (
-        <div class="flex justify-center w-full">
-          <iconifyIconOffline
-            icon={scope.row.lockoutEnabled ? Check : Close}
-            style={{
-              color: scope.row.lockoutEnabled ? "#13ce66" : "#ff4949",
-              fontSize: "20px"
-            }}
-          />
-        </div>
+        <el-switch v-model={scope.row.lockoutEnabled} disabled />
       )
     },
     {
       label: "操作",
       fixed: "right",
-      width: 180,
+      width: 200,
       slot: "operation"
     }
   ];
