@@ -43,17 +43,19 @@ const {
 
 <template>
   <div :class="['flex', 'justify-between', deviceDetection() && 'flex-wrap']">
-    <tree
-      ref="treeRef"
-      :class="['mr-2', deviceDetection() ? 'w-full' : 'min-w-[200px]']"
-      :treeData="treeData"
-      :treeLoading="treeLoading"
-      title="字典"
-      :show-context-menu="true"
-      :show-context-add="true"
-      :menu-items="menuItemsTree"
-      @tree-select="onTreeSelect"
-    />
+    <div>
+      <tree
+        ref="treeRef"
+        :class="['mr-2', deviceDetection() ? 'w-full' : 'min-w-[200px]']"
+        :treeData="treeData"
+        :treeLoading="treeLoading"
+        title="字典"
+        :show-context-menu="true"
+        :show-context-add="true"
+        :menu-items="menuItemsTree"
+        @tree-select="onTreeSelect"
+      />
+    </div>
     <div
       :class="[deviceDetection() ? ['w-full', 'mt-2'] : 'w-[calc(100%-200px)]']"
     >

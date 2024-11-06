@@ -37,13 +37,15 @@ const {
 
 <template>
   <div :class="['flex', 'justify-between', deviceDetection() && 'flex-wrap']">
-    <tree
-      ref="treeRef"
-      :class="['mr-2', deviceDetection() ? 'w-full' : 'min-w-[200px]']"
-      :treeData="treeData"
-      :treeLoading="treeLoading"
-      @tree-select="onTreeSelect"
-    />
+    <div :style="{ height: `calc(100vh - 175px)` }">
+      <tree
+        ref="treeRef"
+        :class="['mr-2', deviceDetection() ? 'w-full' : 'min-w-[200px]']"
+        :treeData="treeData"
+        :treeLoading="treeLoading"
+        @tree-select="onTreeSelect"
+      />
+    </div>
     <div
       :class="[deviceDetection() ? ['w-full', 'mt-2'] : 'w-[calc(100%-200px)]']"
     >
