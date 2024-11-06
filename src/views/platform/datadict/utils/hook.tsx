@@ -26,7 +26,7 @@ import {
   valueTypeMaps
 } from "../utils/types";
 import { ValueType, type GetDataByPaged } from "@/api/platform/datas/model";
-import type { ContextMenuItemModel } from "@/views/components/tree/types";
+import type { ContextMenuItemModel } from "@/views/components/tree/utils/types";
 
 export function useDataDict(tableRef: Ref, treeRef: Ref) {
   interface CustomForm extends Partial<GetDataByPaged> {

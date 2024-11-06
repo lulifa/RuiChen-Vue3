@@ -1,6 +1,6 @@
 import "./reset.css";
 import editForm from "../form.vue";
-import editformpermission from "@/views/identity/components/permtree/index.vue";
+import editFormPermission from "@/views/components/permtree/index.vue";
 import { zxcvbn } from "@zxcvbn-ts/core";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
@@ -366,7 +366,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           }
         },
         closeOnClickModal: false,
-        contentRenderer: () => h(editformpermission, { ref: formRef }),
+        contentRenderer: () => h(editFormPermission, { ref: formRef }),
         beforeSure: (done, { options }) => {
           const curData = options.props.formInline as FormItemProps;
           console.log(curData);
@@ -386,7 +386,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         },
         closeOnClickModal: false,
         fullscreen: deviceDetection(),
-        contentRenderer: () => h(editformpermission, { ref: formRef }),
+        contentRenderer: () => h(editFormPermission, { ref: formRef }),
         beforeSure: (done, { options }) => {
           const curData = options.props.formInline as FormItemProps;
           console.log(curData);

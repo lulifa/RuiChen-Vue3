@@ -1,5 +1,5 @@
 import editForm from "../form.vue";
-import editformpermission from "@/views/identity/components/permtree/index.vue";
+import editFormPermission from "@/views/components/permtree/index.vue";
 import { message } from "@/utils/message";
 import { transformI18n } from "@/plugins/i18n";
 import { addDialog } from "@/components/ReDialog";
@@ -194,7 +194,7 @@ export function useRole() {
           }
         },
         closeOnClickModal: false,
-        contentRenderer: () => h(editformpermission, { ref: formRef }),
+        contentRenderer: () => h(editFormPermission, { ref: formRef }),
         beforeSure: (done, { options }) => {
           const curData = options.props.formInline as FormItemProps;
           console.log(curData);
@@ -215,7 +215,7 @@ export function useRole() {
         },
         closeOnClickModal: false,
         fullscreen: deviceDetection(),
-        contentRenderer: () => h(editformpermission, { ref: formRef }),
+        contentRenderer: () => h(editFormPermission, { ref: formRef }),
         beforeSure: (done, { options }) => {
           const curData = options.props.formInline as FormItemProps;
           console.log(curData);

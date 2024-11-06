@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import editForm from "../form.vue";
-import editformpermission from "@/views/identity/components/permtree/index.vue";
+import editFormPermission from "@/views/components/permtree/index.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
 import { addDialog } from "@/components/ReDialog";
@@ -176,7 +176,7 @@ export function useDept() {
           }
         },
         closeOnClickModal: false,
-        contentRenderer: () => h(editformpermission, { ref: formRef }),
+        contentRenderer: () => h(editFormPermission, { ref: formRef }),
         beforeSure: (done, { options }) => {
           const curData = options.props.formInline as FormItemProps;
           console.log(curData);
@@ -197,7 +197,7 @@ export function useDept() {
         },
         closeOnClickModal: false,
         fullscreen: deviceDetection(),
-        contentRenderer: () => h(editformpermission, { ref: formRef }),
+        contentRenderer: () => h(editFormPermission, { ref: formRef }),
         beforeSure: (done, { options }) => {
           const curData = options.props.formInline as FormItemProps;
           console.log(curData);

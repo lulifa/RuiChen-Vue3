@@ -8,7 +8,7 @@ import ExpandIcon from "./svg/expand.svg?component";
 import UnExpandIcon from "./svg/unexpand.svg?component";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
-import type { ContextMenuItemModel } from "./types";
+import type { ContextMenuItemModel } from "./utils/types";
 import "v-contextmenu/dist/themes/default.css";
 import {
   Contextmenu,
