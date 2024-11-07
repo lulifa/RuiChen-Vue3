@@ -8,6 +8,18 @@ export default {
   },
   children: [
     {
+      path: "/system/platform/layout/index",
+      name: "SystemPlatformLayout",
+      component: () => import("@/views/platform/layout/index.vue"),
+      meta: {
+        icon: "ep:menu",
+        extraIcon: "IF-pure-iconfont-new svg",
+        title: "视图布局",
+        showParent: true,
+        roles: ["admin"]
+      }
+    },
+    {
       path: "/system/platform/datadict/index",
       name: "SystemPlatformDataDict",
       component: () => import("@/views/platform/datadict/index.vue"),
