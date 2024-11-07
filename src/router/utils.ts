@@ -26,7 +26,7 @@ const IFrame = () => import("@/layout/frame.vue");
 const modulesRoutes = import.meta.glob("/src/views/**/*.{vue,tsx}");
 
 // 动态路由
-import { getAsyncRoutes } from "@/api/routes";
+import { getAsyncRoutes } from "@/api/system/system-menu/index";
 import { useUserStoreHook } from "@/store/modules/user";
 
 function handRank(routeInfo: any) {
@@ -148,6 +148,15 @@ function addPathMatch() {
   }
 }
 
+function generateMenuTree(array: any, id = null, parentIdKey = "parentId") {
+  return array
+    .filter((item: any) => item[parentIdKey] === id)
+    .map((item: any) => ({
+      ...item,
+      children: generateMenuTree(array, item.id)
+    }));
+}
+
 /** 处理动态路由（后端返回的路由） */
 function handleAsyncRoutes(routeList) {
   if (routeList.length === 0) {
@@ -175,6 +184,7 @@ function handleAsyncRoutes(routeList) {
         }
       }
     );
+    debugger;
     usePermissionStoreHook().handleWholeMenus(routeList);
   }
   if (!useMultiTagsStoreHook().getMultiTagsCache) {
@@ -201,7 +211,8 @@ function initRouter() {
       });
     } else {
       return new Promise(resolve => {
-        getAsyncRoutes().then(({ data }) => {
+        getAsyncRoutes().then(res => {
+          const data = generateMenuTree(res.items);
           handleAsyncRoutes(cloneDeep(data));
           storageLocal().setItem(key, data);
           resolve(router);
@@ -210,7 +221,8 @@ function initRouter() {
     }
   } else {
     return new Promise(resolve => {
-      getAsyncRoutes().then(({ data }) => {
+      getAsyncRoutes().then(res => {
+        const data = generateMenuTree(res.items);
         handleAsyncRoutes(cloneDeep(data));
         resolve(router);
       });
@@ -319,6 +331,10 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
         : modulesRoutesKeys.findIndex(ev => ev.includes(v.path));
       v.component = modulesRoutes[modulesRoutesKeys[index]];
     }
+    // TODO后续这地方要处理下
+    v.meta.icon = "ep:menu";
+    v.meta.showLink = true;
+    v.meta.roles = ["admin"];
     if (v?.children && v.children.length) {
       addAsyncRoutes(v.children);
     }
