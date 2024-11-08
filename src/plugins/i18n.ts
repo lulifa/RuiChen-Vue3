@@ -108,7 +108,10 @@ export const i18n: I18n = createI18n({
       `${responsiveStorageNameSpace()}locale`
     )?.locale ?? "zh",
   fallbackLocale: "en",
-  messages: localesConfigs
+  messages: localesConfigs,
+  silentTranslationWarn: true, // true - warning off
+  missingWarn: false,
+  silentFallbackWarn: true
 });
 
 export function useI18n(app: App) {
