@@ -37,7 +37,7 @@ const {
 
 <template>
   <div :class="['flex', 'justify-between', deviceDetection() && 'flex-wrap']">
-    <div :style="{ height: `calc(100vh - 175px)` }">
+    <div :style="{ height: `calc(100vh - 180px)` }">
       <tree
         ref="treeRef"
         :class="['mr-2', deviceDetection() ? 'w-full' : 'min-w-[200px]']"
