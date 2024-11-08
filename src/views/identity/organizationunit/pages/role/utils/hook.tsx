@@ -41,7 +41,32 @@ export function useRoleOrg(tableRef: Ref, treeRef: Ref) {
     {
       label: "角色名称",
       prop: "name",
-      minWidth: 150
+      headerAlign: "center",
+      align: "left",
+      cellRenderer: ({ row, props }) => {
+        const tags = [
+          { condition: row.isDefault, label: "默认", type: null },
+          { condition: row.isPublic, label: "公开", type: null },
+          { condition: row.isStatic, label: "内置", type: "danger" }
+        ];
+        return (
+          <div style="white-space: nowrap;">
+            {tags.map((tag, index) =>
+              tag.condition ? (
+                <el-tag
+                  key={index}
+                  size={props.size}
+                  type={tag.type}
+                  style="margin-right: 20px;"
+                >
+                  {tag.label}
+                </el-tag>
+              ) : null
+            )}
+            <span>{row.name}</span>
+          </div>
+        );
+      }
     },
     {
       label: "操作",
