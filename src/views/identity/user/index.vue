@@ -68,7 +68,7 @@ const {
         <el-form-item label="高级搜索：" style="width: 80%" prop="filter">
           <el-input
             v-model="form.filter"
-            placeholder="请输入搜索内容，常见的用户字段都可以用高级搜索进行查询，比如用户名称、姓氏、名称、电子邮箱、电话号码等字段"
+            placeholder="请输入查询内容"
             clearable
           />
         </el-form-item>
