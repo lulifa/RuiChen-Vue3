@@ -2,7 +2,7 @@ import {
   type Data,
   type DataItem,
   ValueType
-} from "@/api/platform/datas/model";
+} from "@/api/platform/platform-datas/model";
 
 export const valueTypeMaps: { [key: number]: string } = {
   [ValueType.String]: "String",

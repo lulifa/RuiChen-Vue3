@@ -5,15 +5,15 @@ import type { PaginationProps } from "@pureadmin/table";
 import { deviceDetection } from "@pureadmin/utils";
 import { reactive, ref, onMounted, h, toRaw, computed } from "vue";
 import type { FormProps, FormItemProps } from "../utils/types";
-import type { GetLayoutPagedRequest } from "@/api/platform/layouts/model";
+import type { GetLayoutPagedRequest } from "@/api/platform/platform-layouts/model";
 import {
   create,
   update,
   deleteById,
   get,
   getList
-} from "@/api/platform/layouts";
-import { getByName, getAll } from "@/api/platform/datas/index";
+} from "@/api/platform/platform-layouts";
+import { getByName, getAll } from "@/api/platform/platform-datas/index";
 
 export function useLayout() {
   interface CustomForm extends Partial<GetLayoutPagedRequest> {

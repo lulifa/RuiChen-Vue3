@@ -17,7 +17,7 @@ import {
   createItem,
   updateItem,
   removeItem
-} from "@/api/platform/datas";
+} from "@/api/platform/platform-datas";
 import {
   type FormItemProps,
   type FormProps,
@@ -25,7 +25,10 @@ import {
   type FormPropsTree,
   valueTypeMaps
 } from "../utils/types";
-import { ValueType, type GetDataByPaged } from "@/api/platform/datas/model";
+import {
+  ValueType,
+  type GetDataByPaged
+} from "@/api/platform/platform-datas/model";
 import type { ContextMenuItemModel } from "@/views/components/tree/utils/types";
 
 export function useDataDict(tableRef: Ref, treeRef: Ref) {

@@ -1,4 +1,4 @@
-import type { Layout } from "@/api/platform/layouts/model";
+import type { Layout } from "@/api/platform/platform-layouts/model";
 
 interface FormItemProps extends Layout {}
 interface FormProps {
