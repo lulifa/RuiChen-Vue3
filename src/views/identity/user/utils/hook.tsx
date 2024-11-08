@@ -69,14 +69,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     {
       label: "用户名",
       prop: "userName",
-      width: 180
+      width: 300
     },
     {
       label: "电子邮箱",
       prop: "email",
       headerAlign: "center",
       align: "left",
-      width: 180,
+      width: 200,
       cellRenderer: ({ row, props }) => {
         if (row.email) {
           return (
@@ -98,7 +98,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       prop: "phoneNumber",
       headerAlign: "center",
       align: "left",
-      width: 180,
+      width: 200,
       cellRenderer: ({ row, props }) => {
         if (row.phoneNumber) {
           return (
